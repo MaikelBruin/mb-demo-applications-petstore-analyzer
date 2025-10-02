@@ -35,6 +35,10 @@ components:
         soldPets:
           type: integer
           description: The total number of sold pets.
+      example:
+        ratio: 0.5
+        availablePets: 4
+        soldPets: 8
 
 
 
