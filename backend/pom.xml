@@ -14,11 +14,104 @@
     <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
+    <properties>
+        <org.openapitools.version>7.15.0</org.openapitools.version>
+        <api.defininiton.input.file>${project.parent.basedir}/api/definition/petstore-analyzer-api.yaml
+        </api.defininiton.input.file>
+        <api.package.api>mb.demo.applications.petstore.analyzer.webapi.api</api.package.api>
+        <api.package.model>mb.demo.applications.petstore.analyzer.webapi.model</api.package.model>
+        <api.package.invoker>mb.demo.applications.petstore.analyzer.webapi.client</api.package.invoker>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>3.4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.2.27</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.18.3</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-client -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>3.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>3.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-multipart</artifactId>
+            <version>3.1.2</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- Generate the code from the Open API definition  -->
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${org.openapitools.version}</version>
+                <executions>
+                    <execution>
+                        <id>petstore-analyzer-api-generate</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+                            <inputSpec>${api.defininiton.input.file}</inputSpec>
+                            <generatorName>java</generatorName>
+                            <library>jersey3</library>
+                            <apiPackage>${api.package.api}</apiPackage>
+                            <modelPackage>${api.package.model}</modelPackage>
+                            <invokerPackage>${api.package.invoker}</invokerPackage>
+                            <addCompileSourceRoot>true</addCompileSourceRoot>
+                            <generateApiTests>false</generateApiTests>
+                            <generateApis>true</generateApis>
+                            <generateApiDocumentation>true</generateApiDocumentation>
+                            <generateModels>true</generateModels>
+                            <generateModelDocumentation>true</generateModelDocumentation>
+                            <generateModelTests>false</generateModelTests>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <configOptions>
+                                <useOptional>true</useOptional>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <interfaceOnly>true</interfaceOnly>
+                                <openApiNullable>false</openApiNullable>
+                                <useJakartaEe>true</useJakartaEe>
+                                <containerDefaultToNull>true</containerDefaultToNull>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

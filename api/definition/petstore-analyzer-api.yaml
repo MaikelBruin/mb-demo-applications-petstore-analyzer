@@ -1,0 +1,42 @@
+openapi: 3.0.1
+info:
+  title: petstore analyzer
+  description: 'An api to demonstrate working with (external) dependencies and usage of generated clients and mocks'
+  version: '1.0.0'
+servers:
+  - url: 'https://localhost:8080'
+    description: 'local'
+paths:
+  /api/talents:
+    get:
+      tags:
+        - availability
+      operationId: getPetAvailabilityRatio
+      summary: Gets the ratio of available pets vs sold pets from the petstore
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityRatioResponse'
+components:
+  schemas:
+    AvailabilityRatioResponse:
+      title: AvailabilityRatioResponse
+      type: object
+      properties:
+        ratio:
+          type: number
+          description: The ratio of available pets compared to sold pets.
+        availablePets:
+          type: integer
+          description: The total number of available pets.
+        soldPets:
+          type: integer
+          description: The total number of sold pets.
+
+
+
+
+
