@@ -16,6 +16,7 @@
 
     <properties>
         <org.openapitools.version>7.15.0</org.openapitools.version>
+        <camel.version>4.10.2</camel.version>
         <api.defininiton.input.file>${project.parent.basedir}/api/definition/petstore-analyzer-api.yaml
         </api.defininiton.input.file>
         <api.package.api>mb.demo.applications.petstore.analyzer.webapi.api</api.package.api>
@@ -66,6 +67,44 @@
             <artifactId>jersey-media-multipart</artifactId>
             <version>3.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.42</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.0.2</version>
+        </dependency>
+
+        <!-- Apache Camel libs -->
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-starter</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-rest-starter</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-rest-openapi-starter</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-platform-http-starter</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-jackson-starter</artifactId>
+            <version>${camel.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -73,6 +112,39 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+
+                <executions>
+                    <execution>
+                        <id>build-properties</id>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                        <configuration>
+                            <additionalProperties>
+                                <encoding.source>UTF-8</encoding.source>
+                                <encoding.reporting>UTF-8</encoding.reporting>
+                                <java.source>${maven.compiler.source}</java.source>
+                                <java.target>${maven.compiler.target}</java.target>
+                            </additionalProperties>
+                        </configuration>
+                    </execution>
+
+                    <!-- For deployments to our DTAP-environments, we need the executable fat jar and run with java -jar. -->
+                    <execution>
+                        <phase>package</phase>
+                        <id>boot-repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>petstore-analyzer</finalName>
+                            <classifier>boot</classifier>
+                            <mainClass>
+                                mb.demo.applications.petstore.analyzer.PetstoreAnalyzerApplication
+                            </mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <!-- Generate the code from the Open API definition  -->
             <plugin>
@@ -88,8 +160,8 @@
                         <configuration>
                             <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
                             <inputSpec>${api.defininiton.input.file}</inputSpec>
-                            <generatorName>java</generatorName>
-                            <library>jersey3</library>
+                            <generatorName>spring</generatorName>
+                            <library>spring-boot</library>
                             <apiPackage>${api.package.api}</apiPackage>
                             <modelPackage>${api.package.model}</modelPackage>
                             <invokerPackage>${api.package.invoker}</invokerPackage>
@@ -103,9 +175,14 @@
                             <generateSupportingFiles>true</generateSupportingFiles>
                             <configOptions>
                                 <useOptional>true</useOptional>
+                                <returnSuccessCode>true</returnSuccessCode>
+                                <useTags>true</useTags>
+                                <virtualService>false</virtualService>
                                 <hideGenerationTimestamp>true</hideGenerationTimestamp>
                                 <interfaceOnly>true</interfaceOnly>
+                                <skipDefaultInterface>true</skipDefaultInterface>
                                 <openApiNullable>false</openApiNullable>
+                                <useSpringBoot3>true</useSpringBoot3>
                                 <useJakartaEe>true</useJakartaEe>
                                 <containerDefaultToNull>true</containerDefaultToNull>
                             </configOptions>

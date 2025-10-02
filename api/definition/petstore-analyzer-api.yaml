@@ -7,7 +7,7 @@ servers:
   - url: 'https://localhost:8080'
     description: 'local'
 paths:
-  /api/talents:
+  /api/availability/ratio:
     get:
       tags:
         - availability
