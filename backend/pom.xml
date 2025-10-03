@@ -124,14 +124,13 @@
         <!-- END Apache Camel libs -->
 
 
-        <!-- GENERATED CLIENT -->
+        <!-- GENERATED CLIENT: please note that generated client dependencies should come from your own private artifact repository, e.g. nexus/jfrog -->
         <dependency>
             <groupId>mb.demos.openapi.generated.api.client</groupId>
             <artifactId>petstore</artifactId>
             <version>1.0.27</version>
-            <scope>system</scope>
-            <systemPath>somepath</systemPath>
         </dependency>
+        <!-- END GENERATED CLIENT -->
     </dependencies>
 
     <build>
