@@ -1,18 +1,18 @@
 package mb.demo.applications.petstore.analyzer.routes;
 
-import mb.demo.applications.petstore.analyzer.service.AvailabilityService;
+import mb.demo.applications.petstore.analyzer.service.RatiosService;
 import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import org.apache.camel.CamelContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AvailabilityRouteBuilder extends BaseRouteBuilder {
+public class RatiosRouteBuilder extends BaseRouteBuilder {
 
-    private final AvailabilityService availabilityService;
+    private final RatiosService ratiosService;
 
-    public AvailabilityRouteBuilder(final CamelContext context, final AvailabilityService availabilityService) {
+    public RatiosRouteBuilder(final CamelContext context, final RatiosService ratiosService) {
         super(context);
-        this.availabilityService = availabilityService;
+        this.ratiosService = ratiosService;
     }
 
     @Override
@@ -20,10 +20,8 @@ public class AvailabilityRouteBuilder extends BaseRouteBuilder {
         from(RouteBuilderConstants.DIRECT_ROUTE_GET_AVAILABILITY_RATIO)
                 .routeId(RouteBuilderConstants.DIRECT_ROUTE_GET_AVAILABILITY_RATIO + "Id")
                 .process(exchange -> {
-                    AvailabilityRatioResponse response = availabilityService.getPetAvailabilityRatio();
+                    AvailabilityRatioResponse response = ratiosService.getPetAvailabilityRatio();
                     exchange.getMessage().setBody(response);
                 });
-
-
     }
 }

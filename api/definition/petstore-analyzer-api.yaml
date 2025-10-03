@@ -7,10 +7,10 @@ servers:
   - url: 'https://localhost:8080'
     description: 'local'
 paths:
-  /api/availability/ratio:
+  /api/ratios/availablity:
     get:
       tags:
-        - availability
+        - ratios
       operationId: getPetAvailabilityRatio
       summary: Gets the ratio of available pets vs sold pets from the petstore
       responses:
@@ -20,6 +20,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AvailabilityRatioResponse'
+  /api/totals/dogs:
+    get:
+      tags:
+        - totals
+      operationId: getTotalNumberOfDogs
+      summary: Gets the total number of dogs in the petstore
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalResponse'
+  /api/totals/cats:
+    get:
+      tags:
+        - totals
+      operationId: getTotalNumberOfCats
+      summary: Gets the total number of cats in the petstore
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalResponse'
 components:
   schemas:
     AvailabilityRatioResponse:
@@ -29,16 +55,27 @@ components:
         ratio:
           type: number
           description: The ratio of available pets compared to sold pets.
+          example: 0.5
         availablePets:
           type: integer
           description: The total number of available pets.
+          example: 4
         soldPets:
           type: integer
           description: The total number of sold pets.
+          example: 8
       example:
         ratio: 0.5
         availablePets: 4
         soldPets: 8
+    TotalResponse:
+      title: TotalResponse
+      type: object
+      properties:
+        total:
+          type: integer
+          description: The total number of dogs found in the petstore.
+          example: 101
 
 
 
