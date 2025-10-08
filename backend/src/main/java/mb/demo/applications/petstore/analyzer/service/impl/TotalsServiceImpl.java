@@ -35,4 +35,12 @@ public class TotalsServiceImpl implements TotalsService {
         response.setTotal(dogs.size());
         return response;
     }
+
+    @Override
+    public TotalResponse getTotalNumberOfAvailablePets() throws ApiException {
+        List<Pet> available = petApi.findPetsByStatus("available");
+        TotalResponse response = new TotalResponse();
+        response.setTotal(available.size());
+        return response;
+    }
 }

@@ -29,5 +29,11 @@ public class TotalsRouteBuilder extends BaseRouteBuilder {
                     TotalResponse response = totalsService.getTotalNumberOfCats();
                     exchange.getMessage().setBody(response);
                 });
+        from(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_AVAILABLE)
+                .routeId(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_AVAILABLE + "Id")
+                .process(exchange -> {
+                    TotalResponse response = totalsService.getTotalNumberOfAvailablePets();
+                    exchange.getMessage().setBody(response);
+                });
     }
 }

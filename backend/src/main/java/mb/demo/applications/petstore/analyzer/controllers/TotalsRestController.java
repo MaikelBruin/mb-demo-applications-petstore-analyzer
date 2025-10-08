@@ -37,4 +37,15 @@ public class TotalsRestController extends BaseRestController implements TotalsAp
         final TotalResponse totalResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_DOGS, null, TotalResponse.class);
         return ResponseEntity.ok(totalResponse);
     }
+
+    @Override
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/api/totals/available",
+            produces = {"application/json"}
+    )
+    public ResponseEntity<TotalResponse> getTotalNumberOfAvailablePets() {
+        final TotalResponse totalResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_AVAILABLE, null, TotalResponse.class);
+        return ResponseEntity.ok(totalResponse);
+    }
 }

@@ -13,10 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-
-import java.net.http.HttpRequest;
-import java.util.UUID;
 
 @Configuration
 public class PetstoreClientConfiguration {
