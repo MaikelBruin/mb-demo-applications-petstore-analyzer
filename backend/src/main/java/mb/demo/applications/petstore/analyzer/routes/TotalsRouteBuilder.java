@@ -5,6 +5,8 @@ import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
 import org.apache.camel.CamelContext;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class TotalsRouteBuilder extends BaseRouteBuilder {
 
@@ -33,6 +35,18 @@ public class TotalsRouteBuilder extends BaseRouteBuilder {
                 .routeId(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_AVAILABLE + "Id")
                 .process(exchange -> {
                     TotalResponse response = totalsService.getTotalNumberOfAvailablePets();
+                    exchange.getMessage().setBody(response);
+                });
+        from(RouteBuilderConstants.DIRECT_ROUTE_FIND_TOTAL)
+                .routeId(RouteBuilderConstants.DIRECT_ROUTE_FIND_TOTAL + "Id")
+                .process(exchange -> {
+                    final Map<String, Object> params = exchange.getIn().getBody(Map.class);
+                    final String tag = (String) params.get("tag");
+
+                    if (tag == null) {
+                        throw new RuntimeException("tag is null");
+                    }
+                    TotalResponse response = totalsService.findTotalNumberOfPets(tag);
                     exchange.getMessage().setBody(response);
                 });
     }

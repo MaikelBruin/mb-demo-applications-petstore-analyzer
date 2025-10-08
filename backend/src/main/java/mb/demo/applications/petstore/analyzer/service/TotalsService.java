@@ -7,4 +7,5 @@ public interface TotalsService {
     TotalResponse getTotalNumberOfDogs() throws ApiException, InterruptedException;
     TotalResponse getTotalNumberOfCats() throws ApiException, InterruptedException;
     TotalResponse getTotalNumberOfAvailablePets() throws ApiException, InterruptedException;
+    TotalResponse findTotalNumberOfPets(String tag) throws ApiException, InterruptedException;
 }

@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 public class TotalsRestController extends BaseRestController implements TotalsApi {
 
@@ -46,6 +49,20 @@ public class TotalsRestController extends BaseRestController implements TotalsAp
     )
     public ResponseEntity<TotalResponse> getTotalNumberOfAvailablePets() {
         final TotalResponse totalResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_AVAILABLE, null, TotalResponse.class);
+        return ResponseEntity.ok(totalResponse);
+    }
+
+    @Override
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/api/totals",
+            produces = {"application/json"}
+    )
+    public ResponseEntity<TotalResponse> findTotalNumberOfPetsByTag(final String tag) {
+        final Map<String, Object> params = new HashMap<>();
+        params.put("tag", tag);
+
+        final TotalResponse totalResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_FIND_TOTAL, params, TotalResponse.class);
         return ResponseEntity.ok(totalResponse);
     }
 }
