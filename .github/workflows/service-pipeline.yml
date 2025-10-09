@@ -8,12 +8,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-petstore-analyzer-api-client:
-    name: petstore analyzer
-    uses: ./.github/workflows/generate-client-workflow.yml
-    with:
-      openapi_spec_path: 'api/definition/petstore-analyzer-api.yaml'
-      app_name: 'petstore-analyzer'
-      package_name: 'petstore.analyzer'
-    secrets:
-      personal_access_token: ${{ secrets.MB_PAT }}
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build and test service
+        run: |
+          mvn clean install
