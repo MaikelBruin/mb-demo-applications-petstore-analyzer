@@ -1,0 +1,19 @@
+name: OpenAPI Client Generation and Deploy pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+  workflow_dispatch:
+
+jobs:
+  generate-petstore-analyzer-api-client:
+    name: petstore analyzer
+    uses: ./.github/workflows/generate-client-workflow.yml
+    with:
+      openapi_spec_path: 'api/definition/petstore-analyzer-api.yaml'
+      app_name: 'petstore-analyzer'
+      package_name: 'petstore.analyzer'
+    secrets:
+      personal_access_token: ${{ secrets.MB_PAT }}

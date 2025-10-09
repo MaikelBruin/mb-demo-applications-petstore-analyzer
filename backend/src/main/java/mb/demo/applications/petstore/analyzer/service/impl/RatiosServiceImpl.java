@@ -23,9 +23,44 @@ public class RatiosServiceImpl implements RatiosService {
 
     @Override
     public AvailabilityRatioResponse getPetAvailabilityRatio() throws ApiException, InterruptedException {
-        List<Pet> availablePets = petApi.findPetsByStatus(Pet.StatusEnum.AVAILABLE.getValue());
-        Thread.sleep(5000);
-        List<Pet> soldPets = petApi.findPetsByStatus(Pet.StatusEnum.SOLD.getValue());
+        List<Pet> availablePets = null;
+        List<Pet> soldPets = null;
+        int retries = 0;
+        int maxRetries = 5;
+        int pollInterval = 2000;
+
+        while (retries < maxRetries && availablePets == null) {
+            try {
+                availablePets = petApi.findPetsByStatus(Pet.StatusEnum.AVAILABLE.getValue());
+            } catch (Exception e) {
+                retries++;
+                int retriesRemaining = maxRetries - retries;
+                log.warn("retrieving available pets failed, retrying another '{}' times... message: '{}'", retriesRemaining, e.getMessage());
+                Thread.sleep(pollInterval);
+            }
+        }
+
+        retries = 0;
+        while (retries < maxRetries && soldPets == null) {
+            try {
+                soldPets = petApi.findPetsByStatus(Pet.StatusEnum.SOLD.getValue());
+            } catch (Exception e) {
+                retries++;
+                int retriesRemaining = maxRetries - retries;
+                log.warn("retrieving sold pets failed, retrying another '{}' times... message: '{}'", retriesRemaining, e.getMessage());
+                Thread.sleep(pollInterval);
+            }
+        }
+
+        if (availablePets == null) {
+            throw new ApiException("Could not get available pets after '" + maxRetries + "' retries");
+        }
+
+        if (soldPets == null) {
+            throw new ApiException("Could not get sold pets after '" + maxRetries + "' retries");
+        }
+
+
         AvailabilityRatioResponse response = new AvailabilityRatioResponse();
         response.setAvailablePets(availablePets.size());
         response.setSoldPets(soldPets.size());
