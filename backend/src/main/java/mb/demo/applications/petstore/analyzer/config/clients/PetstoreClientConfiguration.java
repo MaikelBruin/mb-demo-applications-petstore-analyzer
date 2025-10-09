@@ -23,7 +23,7 @@ public class PetstoreClientConfiguration {
     private String baseUrl;
 
     @Value("${services.petstore.connection-timeout}")
-    private Integer connectionTimeOut; // in milliseconds
+    private Integer connectionTimeout;
 
     @Bean
     public PetApi petApi(ObjectMapper objectMapper) {
@@ -33,7 +33,7 @@ public class PetstoreClientConfiguration {
     private ApiClient createApiClient(ObjectMapper objectMapper) {
         final ApiClient apiClient = new ApiClient();
         apiClient.setBasePath(baseUrl);
-        apiClient.setConnectTimeout(connectionTimeOut);
+        apiClient.setConnectTimeout(connectionTimeout);
         apiClient.setHttpClient(createJerseyClient(objectMapper));
         return apiClient;
     }
@@ -43,7 +43,7 @@ public class PetstoreClientConfiguration {
         JacksonJsonProvider jacksonJsonProvider = new JacksonJsonProvider();
         jacksonJsonProvider.setMapper(objectMapper);
         client.register(jacksonJsonProvider, 1);
-        client.property("jersey.config.client.connectTimeout", connectionTimeOut);
+        client.property("jersey.config.client.connectTimeout", connectionTimeout);
         client.register(new JerseyRequestFilter(PetstoreClientConfiguration.class));
         return client;
     }
