@@ -24,6 +24,14 @@
         <api.package.invoker>mb.demo.applications.petstore.analyzer.webapi.client</api.package.invoker>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>MB github packages</name>
+            <url>https://maven.pkg.github.com/MaikelBruin/mb-pipelines-openapi-generator</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

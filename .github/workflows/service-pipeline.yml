@@ -1,4 +1,4 @@
-name: OpenAPI Client Generation and Deploy pipeline
+name: Service pipeline
 
 on:
   push:
@@ -17,6 +17,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          server-id: github
+          server-password: ${{ secrets.MB_PAT }}
+          server-username: ${{ github.actor }}
       - name: Build and test service
         run: |
           pwd
