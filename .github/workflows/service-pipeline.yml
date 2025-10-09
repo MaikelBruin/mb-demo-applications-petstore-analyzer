@@ -18,13 +18,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           server-id: github
-          server-password: ${{ secrets.MB_PAT }}
-          server-username: ${{ github.actor }}
+          server-username: MB_GITHUB_USERNAME
+          server-password: MB_GITHUB_PASS
+          cache: maven
       - name: Build and test service
         run: |
-          pwd
-          ls
           mvn clean install
+        env:
+          MB_GITHUB_USERNAME: ${{ github.actor }}
+          MB_GITHUB_PASS: ${{ secrets.MB_PAT }}
       - name: Publish Test Report to GitHub Checks
         uses: dorny/test-reporter@v2
         if: ${{ !cancelled() }}
