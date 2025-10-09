@@ -11,6 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -18,4 +19,13 @@ jobs:
           distribution: 'temurin'
       - name: Build and test service
         run: |
+          pwd
+          ls
           mvn clean install
+      - name: Publish Test Report to GitHub Checks
+        uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: Maven Surefire Test Report
+          path: backend/target/*-reports/*.xml
+          reporter: java-junit
