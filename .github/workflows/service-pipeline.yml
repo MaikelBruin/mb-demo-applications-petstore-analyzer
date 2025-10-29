@@ -1,0 +1,36 @@
+name: Service pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          server-id: github
+          server-username: MB_GITHUB_USERNAME
+          server-password: MB_GITHUB_PASS
+          cache: maven
+      - name: Build and test service
+        run: |
+          mvn clean install
+        env:
+          MB_GITHUB_USERNAME: ${{ github.actor }}
+          MB_GITHUB_PASS: ${{ secrets.MB_PAT }}
+      - name: Publish Test Report to GitHub Checks
+        uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: Maven Surefire Test Report
+          path: backend/target/*-reports/*.xml
+          reporter: java-junit
