@@ -13,8 +13,6 @@ import mb.demos.openapi.generated.api.client.petstore.api.PetApiClient;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.web.client.ExtractingResponseErrorHandler;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 
@@ -29,12 +27,7 @@ public class PetstoreAnalyzerStepDefs extends BaseCucumberStepDefs {
 
     @Given("I have access to the petstore")
     public void iHaveAccessToThePetstore() {
-        assertThat(petApiClient).isNotNull();
-    }
-
-    @When("I get the endpoint {string} without parameters")
-    public void iGetTheEndpointWithoutParameters(String endpoint) {
-
+        assertThat(petApi).isNotNull();
     }
 
     @When("I get the total number of dogs")
