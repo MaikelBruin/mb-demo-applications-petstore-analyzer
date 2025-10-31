@@ -3,6 +3,7 @@ package mb.demo.applications.petstore.analyzer.base.cucumber.steps;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.base.cucumber.TestDataHolder;
+import mb.demos.openapi.generated.api.client.petstore.api.PetApiClient;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -16,13 +17,15 @@ public abstract class BaseCucumberStepDefs {
     protected final TestRestTemplate testRestTemplate;
     protected final TestDataHolder testDataHolder;
     protected final ObjectMapper objectMapper;
+    protected final PetApiClient petApiClient;
 
-    public BaseCucumberStepDefs(final CamelContext camelContext, final ProducerTemplate producerTemplate, final TestDataHolder testDataHolder, final ObjectMapper objectMapper, final TestRestTemplate testRestTemplate) {
+    public BaseCucumberStepDefs(final CamelContext camelContext, final ProducerTemplate producerTemplate, final TestDataHolder testDataHolder, final ObjectMapper objectMapper, final TestRestTemplate testRestTemplate, final PetApiClient petApiClient) {
         this.camelContext = camelContext;
         this.producerTemplate = producerTemplate;
         this.testRestTemplate = testRestTemplate;
         this.testDataHolder = testDataHolder;
         this.objectMapper = objectMapper;
+        this.petApiClient = petApiClient;
         RestTemplate restTemplate = testRestTemplate.getRestTemplate();
         restTemplate.setErrorHandler(new ExtractingResponseErrorHandler());
     }
