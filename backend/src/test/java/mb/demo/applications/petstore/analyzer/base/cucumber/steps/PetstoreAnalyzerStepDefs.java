@@ -8,6 +8,7 @@ import io.cucumber.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.base.cucumber.TestDataHolder;
 import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
+import mb.demo.applications.petstore.analyzer.webapi.model.HasAvailableResponse;
 import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
@@ -118,4 +119,16 @@ public class PetstoreAnalyzerStepDefs extends BaseCucumberStepDefs {
     }
 
 
+    @When("I get if there are any rats available")
+    public void iGetIfThereAreAnyRatsAvailable() {
+        log.info("checking if there are any rats available...");
+        String fullUri = "/api/available/rats";
+        HasAvailableResponse response = testRestTemplate.getForObject(fullUri, HasAvailableResponse.class);
+        testDataHolder.setHasAvailableResponse(response);
+    }
+
+    @Then("the has available rats response should not be null")
+    public void theHasAvailableRatsResponseShouldNotBeNull() {
+        assertThat(testDataHolder.getHasAvailableResponse()).isNotNull();
+    }
 }

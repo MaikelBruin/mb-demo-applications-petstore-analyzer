@@ -27,3 +27,7 @@ Feature: Petstore analyzer integrated tests
     When I get the ratio of available pets vs sold pets
     Then the availability ratio response should not be null
     And the availability ratio should be equal to the total available divided by the total sold
+
+  Scenario: Get has available rats should not throw exception
+    When I get if there are any rats available
+    Then the has available rats response should not be null

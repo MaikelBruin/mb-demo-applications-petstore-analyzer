@@ -3,6 +3,7 @@ Feature: Petstore analyzer isolated tests
   Background:
     Given I have access to the mocked petstore
 
+    ################### same tests as integrated ##################################################
   Scenario: Get total number of dogs should not throw exception
     When I get the total number of dogs
     Then the total number of dogs response should not be null
@@ -22,3 +23,15 @@ Feature: Petstore analyzer isolated tests
     When I get the ratio of available pets vs sold pets
     Then the availability ratio response should not be null
     And the availability ratio should be equal to the total available divided by the total sold
+
+  Scenario: Get has available rats should not throw exception
+    When I get if there are any rats available
+    Then the has available rats response should not be null
+
+    ################### END same tests as integrated ##################################################
+
+  Scenario: Availability ratio - Division by zero should result not result in exception
+    Given I configured the petstore find pets by status "sold" response to return an empty array
+    When I get the ratio of available pets vs sold pets
+    Then the availability ratio response should not be null
+
