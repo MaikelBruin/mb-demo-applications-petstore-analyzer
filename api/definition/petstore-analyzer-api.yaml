@@ -20,7 +20,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HasAvailableResponse'
-  /api/ratios/availablity:
+  /api/ratios/availability:
     get:
       tags:
         - ratios
