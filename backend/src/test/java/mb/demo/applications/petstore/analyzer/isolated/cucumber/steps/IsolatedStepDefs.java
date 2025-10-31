@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.integrated.cucumber.steps;
+package mb.demo.applications.petstore.analyzer.isolated.cucumber.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
@@ -14,21 +14,19 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Slf4j
-public class IntegratedStepDefs extends BaseCucumberStepDefs {
-
+public class IsolatedStepDefs extends BaseCucumberStepDefs {
     private final PetApiClient petApiClient;
 
-    public IntegratedStepDefs(CamelContext camelContext, ProducerTemplate producerTemplate, TestDataHolder testDataHolder, ObjectMapper objectMapper, TestRestTemplate testRestTemplate, PetApiClient petApiClient, final PetApiClient petApiClient1) {
+    public IsolatedStepDefs(CamelContext camelContext, ProducerTemplate producerTemplate, TestDataHolder testDataHolder, ObjectMapper objectMapper, TestRestTemplate testRestTemplate, final PetApiClient petApiClient) {
         super(camelContext, producerTemplate, testDataHolder, objectMapper, testRestTemplate);
-        this.petApiClient = petApiClient1;
+        this.petApiClient = petApiClient;
     }
 
-    @Given("I have access to the actual petstore")
-    public void iHaveAccessToTheActualPetstore() {
-        log.info("I have access to the actual petstore");
+    @Given("I have access to the mocked petstore")
+    public void iHaveAccessToTheMockedPetstore() {
+        log.info("I have access to the mocked petstore");
+        assertThat(petApiClient).isNotNull();
         boolean isSpy = Mockito.mockingDetails(petApiClient).isSpy();
-        assertThat(isSpy).isFalse();
+        assertThat(isSpy).isTrue();
     }
-
-
 }

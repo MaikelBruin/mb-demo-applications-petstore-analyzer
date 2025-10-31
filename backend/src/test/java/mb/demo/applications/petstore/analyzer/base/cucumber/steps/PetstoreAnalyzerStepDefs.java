@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.base.cucumber.TestDataHolder;
 import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
-import mb.demos.openapi.generated.api.client.petstore.api.PetApiClient;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -21,13 +20,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Slf4j
 public class PetstoreAnalyzerStepDefs extends BaseCucumberStepDefs {
 
-    public PetstoreAnalyzerStepDefs(CamelContext camelContext, ProducerTemplate producerTemplate, TestDataHolder testDataHolder, ObjectMapper objectMapper, TestRestTemplate testRestTemplate, PetApiClient petApiClient) {
-        super(camelContext, producerTemplate, testDataHolder, objectMapper, testRestTemplate, petApiClient);
-    }
-
-    @Given("I have access to the petstore")
-    public void iHaveAccessToThePetstore() {
-        assertThat(petApi).isNotNull();
+    public PetstoreAnalyzerStepDefs(CamelContext camelContext, ProducerTemplate producerTemplate, TestDataHolder testDataHolder, ObjectMapper objectMapper, TestRestTemplate testRestTemplate) {
+        super(camelContext, producerTemplate, testDataHolder, objectMapper, testRestTemplate);
     }
 
     @When("I get the total number of dogs")
@@ -122,4 +116,6 @@ public class PetstoreAnalyzerStepDefs extends BaseCucumberStepDefs {
         BigDecimal expected = BigDecimal.valueOf((float) availablePets / soldPets);
         assertThat(testDataHolder.getAvailabilityRatioResponse().getRatio()).isEqualTo(expected);
     }
+
+
 }

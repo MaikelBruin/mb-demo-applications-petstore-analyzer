@@ -1,7 +1,7 @@
 Feature: Petstore analyzer integrated tests
 
   Background:
-    Given I have access to the petstore
+    Given I have access to the actual petstore
 
   Scenario: Get total number of dogs should not throw exception
     When I get the total number of dogs
