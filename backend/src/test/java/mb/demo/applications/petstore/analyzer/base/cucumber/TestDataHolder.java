@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import mb.demo.applications.petstore.analyzer.webapi.model.HasAvailableResponse;
+import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
 
 @NoArgsConstructor
 @Getter
@@ -11,5 +12,7 @@ import mb.demo.applications.petstore.analyzer.webapi.model.HasAvailableResponse;
 public class TestDataHolder {
 
     private HasAvailableResponse hasAvailableResponse;
+    private TotalResponse totalDogsResponse;
+    private TotalResponse totalCatsResponse;
     private Exception exception;
 }
