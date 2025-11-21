@@ -32,5 +32,5 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: Maven Surefire Test Report
-          path: backend/target/*-reports/*.xml
+          path: backend/target/*-reports/TEST-*.xml
           reporter: java-junit

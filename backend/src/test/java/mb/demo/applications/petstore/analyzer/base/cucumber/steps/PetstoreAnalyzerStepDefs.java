@@ -2,7 +2,6 @@ package mb.demo.applications.petstore.analyzer.base.cucumber.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import lombok.extern.slf4j.Slf4j;
@@ -130,5 +129,11 @@ public class PetstoreAnalyzerStepDefs extends BaseCucumberStepDefs {
     @Then("the has available rats response should not be null")
     public void theHasAvailableRatsResponseShouldNotBeNull() {
         assertThat(testDataHolder.getHasAvailableResponse()).isNotNull();
+    }
+
+    @And("the has available rats response should say that there are {string} rats available")
+    public void theHasAvailableRatsResponseShouldSayThatThereAreRatsAvailable(String no) {
+        if (no.isEmpty()) assertThat(testDataHolder.getHasAvailableResponse().getHasAvailable()).isTrue();
+        else assertThat(testDataHolder.getHasAvailableResponse().getHasAvailable()).isFalse();
     }
 }
