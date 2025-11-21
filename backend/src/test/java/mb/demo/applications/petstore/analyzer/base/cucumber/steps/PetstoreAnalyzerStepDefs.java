@@ -131,4 +131,10 @@ public class PetstoreAnalyzerStepDefs extends BaseCucumberStepDefs {
     public void theHasAvailableRatsResponseShouldNotBeNull() {
         assertThat(testDataHolder.getHasAvailableResponse()).isNotNull();
     }
+
+    @And("the has available rats response should say that there are {string} rats available")
+    public void theHasAvailableRatsResponseShouldSayThatThereAreRatsAvailable(String no) {
+        if (no.isEmpty()) assertThat(testDataHolder.getHasAvailableResponse().getHasAvailable()).isTrue();
+        else assertThat(testDataHolder.getHasAvailableResponse().getHasAvailable()).isFalse();
+    }
 }

@@ -35,3 +35,14 @@ Feature: Petstore analyzer isolated tests
     When I get the ratio of available pets vs sold pets
     Then the availability ratio response should not be null
 
+  Scenario: Has available rats - no rats available
+    Given I configured the petstore find pets by tags "rat,rats" response to return an empty array
+    When I get if there are any rats available
+    Then the has available rats response should not be null
+    And the has available rats response should say that there are "no" rats available
+
+  Scenario: Has available rats - has rats available
+    Given I configured the petstore find pets by tags "rat,rats" response to return a non-empty array
+    When I get if there are any rats available
+    Then the has available rats response should not be null
+    And the has available rats response should say that there are "" rats available

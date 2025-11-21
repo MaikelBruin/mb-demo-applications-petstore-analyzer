@@ -64,7 +64,8 @@ public class RatiosServiceImpl implements RatiosService {
         AvailabilityRatioResponse response = new AvailabilityRatioResponse();
         response.setAvailablePets(availablePets.size());
         response.setSoldPets(soldPets.size());
-        response.setRatio(BigDecimal.valueOf((float) availablePets.size() / soldPets.size()));
+        if (soldPets.isEmpty()) response.setRatio(BigDecimal.ZERO);
+        else response.setRatio(BigDecimal.valueOf((float) availablePets.size() / soldPets.size()));
         return response;
     }
 
