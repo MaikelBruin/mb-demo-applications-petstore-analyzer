@@ -3,12 +3,14 @@ spring:
     name: petstore-analyzer
 
 springdoc:
-  show-actuator: true
+  show-actuator: false
   swagger-ui:
     path: /api
     tags-sorter: alpha
+
   api-docs:
     path: /api-docs
+
 
 
 services:
