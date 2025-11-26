@@ -113,7 +113,12 @@ public class PetstoreAnalyzerStepDefs extends BaseCucumberStepDefs {
     public void theAvailabilityRatioShouldBeEqualToTheTotalAvailableDividedByTheTotalSold() {
         Integer availablePets = testDataHolder.getAvailabilityRatioResponse().getAvailablePets();
         Integer soldPets = testDataHolder.getAvailabilityRatioResponse().getSoldPets();
-        BigDecimal expected = BigDecimal.valueOf((float) availablePets / soldPets);
+        BigDecimal expected;
+        if (soldPets == 0) {
+            expected = BigDecimal.ZERO;
+        } else {
+            expected = BigDecimal.valueOf((float) availablePets / soldPets);
+        }
         assertThat(testDataHolder.getAvailabilityRatioResponse().getRatio()).isEqualTo(expected);
     }
 
