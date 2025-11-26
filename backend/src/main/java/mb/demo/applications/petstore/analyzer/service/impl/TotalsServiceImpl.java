@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.service.TotalsService;
 import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
+import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.model.Pet;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class TotalsServiceImpl implements TotalsService {
     }
 
     @Override
-    public TotalResponse getTotalNumberOfDogs() throws InterruptedException {
+    public TotalResponse getTotalNumberOfDogs() throws InterruptedException, ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -31,6 +32,7 @@ public class TotalsServiceImpl implements TotalsService {
                 dogs = petApi.findPetsByTags(List.of("dog"));
             } catch (Exception e) {
                 retries++;
+                if (retries == maxRetries) throw e;
                 int retriesRemaining = maxRetries - retries;
                 log.warn("retrieving total number of dogs failed, retrying another '{}' times... message: '{}'", retriesRemaining, e.getMessage());
                 Thread.sleep(pollInterval);
@@ -43,7 +45,7 @@ public class TotalsServiceImpl implements TotalsService {
     }
 
     @Override
-    public TotalResponse getTotalNumberOfCats() throws InterruptedException {
+    public TotalResponse getTotalNumberOfCats() throws InterruptedException, ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -54,6 +56,7 @@ public class TotalsServiceImpl implements TotalsService {
                 cats = petApi.findPetsByTags(List.of("cat"));
             } catch (Exception e) {
                 retries++;
+                if (retries == maxRetries) throw e;
                 int retriesRemaining = maxRetries - retries;
                 log.warn("retrieving total number of cats failed, retrying another '{}' times... message: '{}'", retriesRemaining, e.getMessage());
                 Thread.sleep(pollInterval);
@@ -66,7 +69,7 @@ public class TotalsServiceImpl implements TotalsService {
     }
 
     @Override
-    public TotalResponse getTotalNumberOfAvailablePets() throws InterruptedException {
+    public TotalResponse getTotalNumberOfAvailablePets() throws InterruptedException, ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -77,6 +80,7 @@ public class TotalsServiceImpl implements TotalsService {
                 available = petApi.findPetsByStatus("available");
             } catch (Exception e) {
                 retries++;
+                if (retries == maxRetries) throw e;
                 int retriesRemaining = maxRetries - retries;
                 log.warn("retrieving total number of available pets failed, retrying another '{}' times... message: '{}'", retriesRemaining, e.getMessage());
                 Thread.sleep(pollInterval);
@@ -89,7 +93,7 @@ public class TotalsServiceImpl implements TotalsService {
     }
 
     @Override
-    public TotalResponse findTotalNumberOfPets(String tag) throws InterruptedException {
+    public TotalResponse findTotalNumberOfPets(String tag) throws InterruptedException, ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -100,6 +104,7 @@ public class TotalsServiceImpl implements TotalsService {
                 petsByTag = petApi.findPetsByTags(List.of(tag));
             } catch (Exception e) {
                 retries++;
+                if (retries == maxRetries) throw e;
                 int retriesRemaining = maxRetries - retries;
                 log.warn("retrieving total number of pets with tag '{}' failed, retrying another '{}' times... message: '{}'", tag, retriesRemaining, e.getMessage());
                 Thread.sleep(pollInterval);
