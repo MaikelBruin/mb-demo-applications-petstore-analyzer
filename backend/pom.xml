@@ -192,6 +192,11 @@
             <artifactId>petstore</artifactId>
             <version>1.0.27</version>
         </dependency>
+        <dependency>
+            <groupId>mb.demos.openapi.generated.api.client</groupId>
+            <artifactId>petstore-analyzer-consumer</artifactId>
+            <version>1.1.1-default-b9bc4f6658106914c4fe91b845073a8131d6359e</version>
+        </dependency>
         <!-- END GENERATED CLIENT -->
     </dependencies>
 
