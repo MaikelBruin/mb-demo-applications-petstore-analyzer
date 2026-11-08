@@ -1,13 +1,20 @@
 package mb.demo.applications.petstore.analyzer.isolated;
 
-import mb.demo.applications.petstore.analyzer.base.BaseTestConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import io.cucumber.spring.CucumberContextConfiguration;
+import mb.demo.applications.petstore.analyzer.isolated.bootstrap.IsolatedContainerBootstrapper;
+import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
+import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-@Profile("isolated")
-@Configuration
-@ComponentScan(basePackages = "mb.demos.openapi.generated.api.client")
-public class IsolatedTestConfiguration extends BaseTestConfiguration {
+@CucumberContextConfiguration
+public class IsolatedTestConfiguration extends IsolatedContainerBootstrapper {
+
+    @MockitoBean
+    private PetApi petApi;
+
+    @MockitoBean
+    private EventsApi eventsApi;
+
 
 }
