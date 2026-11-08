@@ -4,8 +4,8 @@ import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
 
 public interface TotalsService {
-    TotalResponse getTotalNumberOfDogs() throws ApiException, InterruptedException;
-    TotalResponse getTotalNumberOfCats() throws ApiException, InterruptedException;
-    TotalResponse getTotalNumberOfAvailablePets() throws ApiException, InterruptedException;
-    TotalResponse findTotalNumberOfPets(String tag) throws ApiException, InterruptedException;
+    TotalResponse getTotalNumberOfDogs() throws ApiException, InterruptedException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException;
+    TotalResponse getTotalNumberOfCats() throws ApiException, InterruptedException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException;
+    TotalResponse getTotalNumberOfAvailablePets() throws ApiException, InterruptedException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException;
+    TotalResponse findTotalNumberOfPets(String tag) throws ApiException, InterruptedException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException;
 }

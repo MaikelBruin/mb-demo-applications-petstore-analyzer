@@ -1,6 +1,7 @@
 package mb.demo.applications.petstore.analyzer.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import mb.demo.applications.petstore.analyzer.service.EventService;
 import mb.demo.applications.petstore.analyzer.service.RatiosService;
 import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
@@ -16,13 +17,15 @@ import java.util.List;
 public class RatiosServiceImpl implements RatiosService {
 
     private final PetApi petApi;
+    private final EventService eventService;
 
-    public RatiosServiceImpl(PetApi petApi) {
+    public RatiosServiceImpl(PetApi petApi, EventService eventService) {
         this.petApi = petApi;
+        this.eventService = eventService;
     }
 
     @Override
-    public AvailabilityRatioResponse getPetAvailabilityRatio() throws ApiException, InterruptedException {
+    public AvailabilityRatioResponse getPetAvailabilityRatio() throws ApiException, InterruptedException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException {
         List<Pet> availablePets = null;
         List<Pet> soldPets = null;
         int retries = 0;
@@ -66,6 +69,8 @@ public class RatiosServiceImpl implements RatiosService {
         response.setSoldPets(soldPets.size());
         if (soldPets.isEmpty()) response.setRatio(BigDecimal.ZERO);
         else response.setRatio(BigDecimal.valueOf((float) availablePets.size() / soldPets.size()));
+
+        eventService.processEvent("availability-ratio", response);
         return response;
     }
 
