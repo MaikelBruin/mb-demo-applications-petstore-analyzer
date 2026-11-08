@@ -6,10 +6,12 @@ import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.Even
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventAcceptedResponse;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventRequestBody;
+import jakarta.ws.rs.ProcessingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
+import java.net.ConnectException;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
@@ -35,7 +37,7 @@ public class EventServiceImpl implements EventService {
         EventRequestBody requestBody = new EventRequestBody();
         requestBody.setEventType(eventType);
         requestBody.setPayload(payload);
-        EventAcceptedResponse acceptedResponse = null;
+        EventAcceptedResponse acceptedResponse;
         try {
             acceptedResponse = eventsApi.processEvent(requestBody);
         } catch (ApiException e) {
@@ -44,9 +46,15 @@ public class EventServiceImpl implements EventService {
                 return new EventAcceptedResponse().eventId(UUID.randomUUID()).receivedAt(Date.from(Instant.now()));
             }
             if (e.getCode() == 503) {
-                throw new ConsumerDownException("Consumer is down");
+                throw new ConsumerDownException("Petstore analyzer consumer is down");
             }
             throw new RuntimeException(e);
+        } catch (ProcessingException e) {
+            //consumer is not reachable at all (e.g. not started): jersey wraps the ConnectException
+            if (e.getCause() instanceof ConnectException) {
+                throw new ConsumerDownException("Petstore analyzer consumer is down: " + e.getCause().getMessage());
+            }
+            throw e;
         }
         return acceptedResponse;
     }

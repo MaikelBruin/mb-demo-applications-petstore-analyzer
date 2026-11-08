@@ -18,7 +18,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @Slf4j
 public class IntegratedStepDefs extends BaseCucumberStepDefs {
 
-    private final PetApi petApiClient;
+    private final PetApi petApi;
     private final EventsApi eventsApi;
 
     public IntegratedStepDefs(CamelContext camelContext,
@@ -29,22 +29,22 @@ public class IntegratedStepDefs extends BaseCucumberStepDefs {
                               final PetApi petApi,
                               final EventsApi eventsApi) {
         super(camelContext, producerTemplate, testDataHolder, objectMapper, testRestTemplate);
-        this.petApiClient = petApi;
+        this.petApi = petApi;
         this.eventsApi = eventsApi;
     }
 
     @Given("I have access to the actual petstore")
     public void iHaveAccessToTheActualPetstore() {
         log.info("I have access to the actual petstore");
-        boolean isSpy = Mockito.mockingDetails(petApiClient).isSpy();
-        assertThat(isSpy).isFalse();
+        boolean isMock = Mockito.mockingDetails(petApi).isMock();
+        assertThat(isMock).isFalse();
     }
 
 
     @And("I have access to the actual consumer")
     public void iHaveAccessToTheActualConsumer() {
         log.info("I have access to the actual consumer");
-        boolean isSpy = Mockito.mockingDetails(eventsApi).isSpy();
-        assertThat(isSpy).isFalse();
+        boolean isMock = Mockito.mockingDetails(eventsApi).isMock();
+        assertThat(isMock).isFalse();
     }
 }
