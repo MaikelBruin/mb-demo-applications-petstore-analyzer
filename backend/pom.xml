@@ -190,7 +190,7 @@
         <dependency>
             <groupId>mb.demos.openapi.generated.api.client</groupId>
             <artifactId>petstore</artifactId>
-            <version>1.0.27</version>
+            <version>1.0.27-default-672feffaaebfdf3e531b12ff3c359ceb079d48fa</version>
         </dependency>
         <dependency>
             <groupId>mb.demos.openapi.generated.api.client</groupId>

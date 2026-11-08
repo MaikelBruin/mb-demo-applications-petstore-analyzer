@@ -2,6 +2,7 @@ Feature: Petstore analyzer integrated tests
 
   Background:
     Given I have access to the actual petstore
+    And I have access to the actual consumer
 
     ################### same tests as isolated ##################################################
 
