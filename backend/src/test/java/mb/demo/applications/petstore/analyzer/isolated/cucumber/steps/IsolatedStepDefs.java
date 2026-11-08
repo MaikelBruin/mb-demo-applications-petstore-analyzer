@@ -65,6 +65,7 @@ public class IsolatedStepDefs extends BaseCucumberStepDefs {
     @Given("I configured the petstore find pets by status {string} response to return an empty array")
     public void iConfiguredThePetstoreFindPetsByStatusResponseToReturnAnEmptyArray(String inputStatus) {
         Mockito.when(petApi.findPetsByStatusWithHttpInfo(inputStatus)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.emptyList()));
+        Mockito.when(petApi.findPetsByStatus(inputStatus)).thenReturn(Collections.emptyList());
     }
 
     @SneakyThrows
@@ -72,6 +73,7 @@ public class IsolatedStepDefs extends BaseCucumberStepDefs {
     public void iConfiguredThePetstoreFindPetsByTagsResponseToReturnAnEmptyArray(String tags) {
         List<String> tagList = Arrays.stream(tags.split(",")).toList();
         Mockito.when(petApi.findPetsByTagsWithHttpInfo(tagList)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.emptyList()));
+        Mockito.when(petApi.findPetsByTags(tagList)).thenReturn(Collections.emptyList());
     }
 
     @SneakyThrows
@@ -84,6 +86,7 @@ public class IsolatedStepDefs extends BaseCucumberStepDefs {
                 .id(947L)
                 .status(Pet.StatusEnum.AVAILABLE);
         Mockito.when(petApi.findPetsByTagsWithHttpInfo(tagList)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.singletonList(rat)));
+        Mockito.when(petApi.findPetsByTags(tagList)).thenReturn(Collections.singletonList(rat));
     }
 
 
@@ -93,19 +96,35 @@ public class IsolatedStepDefs extends BaseCucumberStepDefs {
         Mockito.reset(petApi);
         ApiResponse<Pet> addPetApiResponse = new ApiResponse(200, defaultHeaders, IsolatedTestMockData.addPetResponseExample);
         Mockito.doReturn(addPetApiResponse).when(petApi).addPetWithHttpInfo(Mockito.nullable(Pet.class));
+        Mockito.doReturn(IsolatedTestMockData.addPetResponseExample).when(petApi).addPet(Mockito.nullable(Pet.class));
+
         ApiResponse<Void> deletePetApiResponse = new ApiResponse(200, defaultHeaders);
         Mockito.doReturn(deletePetApiResponse).when(petApi).deletePetWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class));
+        Mockito.doNothing().when(petApi).deletePet(Mockito.nullable(Long.class), Mockito.nullable(String.class));
+
         ApiResponse<List<Pet>> findPetsByStatusApiResponse = new ApiResponse(200, defaultHeaders, IsolatedTestMockData.findPetsByStatusResponseExample);
         Mockito.doReturn(findPetsByStatusApiResponse).when(petApi).findPetsByStatusWithHttpInfo(Mockito.nullable(String.class));
+        Mockito.doReturn(IsolatedTestMockData.findPetsByStatusResponseExample).when(petApi).findPetsByStatus(Mockito.nullable(String.class));
+
         ApiResponse<List<Pet>> findPetsByTagsApiResponse = new ApiResponse(200, defaultHeaders, IsolatedTestMockData.findPetsByTagsResponseExample);
         Mockito.doReturn(findPetsByTagsApiResponse).when(petApi).findPetsByTagsWithHttpInfo(Mockito.nullable(List.class));
+        Mockito.doReturn(IsolatedTestMockData.findPetsByTagsResponseExample).when(petApi).findPetsByTags(Mockito.nullable(List.class));
+
         ApiResponse<Pet> getPetByIdApiResponse = new ApiResponse(200, defaultHeaders, IsolatedTestMockData.getPetByIdResponseExample);
         Mockito.doReturn(getPetByIdApiResponse).when(petApi).getPetByIdWithHttpInfo(Mockito.nullable(Long.class));
+        Mockito.doReturn(IsolatedTestMockData.getPetByIdResponseExample).when(petApi).getPetById(Mockito.nullable(Long.class));
+
         ApiResponse<Pet> updatePetApiResponse = new ApiResponse(200, defaultHeaders, IsolatedTestMockData.updatePetResponseExample);
         Mockito.doReturn(updatePetApiResponse).when(petApi).updatePetWithHttpInfo(Mockito.nullable(Pet.class));
+        Mockito.doReturn(IsolatedTestMockData.updatePetResponseExample).when(petApi).updatePet(Mockito.nullable(Pet.class));
+
         ApiResponse<Pet> updatePetWithFormApiResponse = new ApiResponse(200, defaultHeaders, IsolatedTestMockData.updatePetWithFormResponseExample);
         Mockito.doReturn(updatePetWithFormApiResponse).when(petApi).updatePetWithFormWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(String.class));
+        Mockito.doReturn(IsolatedTestMockData.updatePetWithFormResponseExample).when(petApi).updatePetWithForm(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(String.class));
+
         ApiResponse<ModelApiResponse> uploadFileApiResponse = new ApiResponse(200, defaultHeaders, IsolatedTestMockData.uploadFileResponseExample);
         Mockito.doReturn(uploadFileApiResponse).when(petApi).uploadFileWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(File.class));
+        Mockito.doReturn(IsolatedTestMockData.uploadFileResponseExample).when(petApi).uploadFile(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(File.class));
+
     }
 }
