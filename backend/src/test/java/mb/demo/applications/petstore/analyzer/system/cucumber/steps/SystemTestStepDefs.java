@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.base.cucumber.TestDataHolder;
 import mb.demo.applications.petstore.analyzer.base.cucumber.steps.BaseCucumberStepDefs;
 import mb.demo.applications.petstore.analyzer.exceptions.ConsumerDownException;
+import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
 import mb.demo.applications.petstore.analyzer.exceptions.RestExceptionHandler;
 import mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
@@ -92,6 +93,12 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
                 .thenThrow(new mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException(503, "Service Unavailable"));
     }
 
+    @SneakyThrows
+    @Given("I configured the petstore to respond with a service unavailable exception")
+    public void iConfiguredThePetstoreToRespondWithAServiceUnavailableException() {
+        Mockito.doThrow(new ApiException(503, "Service Unavailable")).when(petApi).findPetsByTags(Mockito.nullable(List.class));
+    }
+
     /**
      * The shared 'I get the total number of dogs' step can not be used for error responses: the rest template throws
      * on 4xx/5xx. Over HTTP only the mapped status is visible, not the exception type: use
@@ -120,6 +127,21 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
         ArgumentCaptor<ConsumerDownException> captor = ArgumentCaptor.forClass(ConsumerDownException.class);
         Mockito.verify(restExceptionHandler).handleConsumerDown(captor.capture());
         Assertions.assertThat(captor.getValue().getCode()).isEqualTo(503);
+    }
+
+    /**
+     * Same approach as for the ConsumerDownException: the handler is only called for a SupplierDownException.
+     */
+    @Then("the analyzer should have thrown a SupplierDownException")
+    public void theAnalyzerShouldHaveThrownASupplierDownException() {
+        ArgumentCaptor<SupplierDownException> captor = ArgumentCaptor.forClass(SupplierDownException.class);
+        Mockito.verify(restExceptionHandler).handleSupplierDown(captor.capture());
+        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(503);
+    }
+
+    @Then("the consumer should not have received any event")
+    public void theConsumerShouldNotHaveReceivedAnyEvent() {
+        Mockito.verifyNoInteractions(eventsApi);
     }
 
     @SneakyThrows

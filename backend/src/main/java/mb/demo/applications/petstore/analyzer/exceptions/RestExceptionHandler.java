@@ -18,4 +18,10 @@ public class RestExceptionHandler {
         log.warn("Petstore analyzer consumer is unavailable: {}", e.getMessage());
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
     }
+
+    @ExceptionHandler(SupplierDownException.class)
+    public ProblemDetail handleSupplierDown(final SupplierDownException e) {
+        log.warn("Petstore supplier is unavailable: {}", e.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, e.getMessage());
+    }
 }

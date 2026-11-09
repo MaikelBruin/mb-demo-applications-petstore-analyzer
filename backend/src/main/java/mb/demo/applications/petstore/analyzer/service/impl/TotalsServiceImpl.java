@@ -1,5 +1,6 @@
 package mb.demo.applications.petstore.analyzer.service.impl;
 
+import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
 import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.service.EventService;
 import mb.demo.applications.petstore.analyzer.service.TotalsService;
@@ -34,6 +35,7 @@ public class TotalsServiceImpl implements TotalsService {
             try {
                 dogs = petApi.findPetsByTags(List.of("dog"));
             } catch (Exception e) {
+                SupplierDownException.throwIfServiceUnavailable(e);
                 retries++;
                 if (retries == maxRetries) throw e;
                 int retriesRemaining = maxRetries - retries;
@@ -59,6 +61,7 @@ public class TotalsServiceImpl implements TotalsService {
             try {
                 cats = petApi.findPetsByTags(List.of("cat"));
             } catch (Exception e) {
+                SupplierDownException.throwIfServiceUnavailable(e);
                 retries++;
                 if (retries == maxRetries) throw e;
                 int retriesRemaining = maxRetries - retries;
@@ -84,6 +87,7 @@ public class TotalsServiceImpl implements TotalsService {
             try {
                 available = petApi.findPetsByStatus("available");
             } catch (Exception e) {
+                SupplierDownException.throwIfServiceUnavailable(e);
                 retries++;
                 if (retries == maxRetries) throw e;
                 int retriesRemaining = maxRetries - retries;
@@ -109,6 +113,7 @@ public class TotalsServiceImpl implements TotalsService {
             try {
                 petsByTag = petApi.findPetsByTags(List.of(tag));
             } catch (Exception e) {
+                SupplierDownException.throwIfServiceUnavailable(e);
                 retries++;
                 if (retries == maxRetries) throw e;
                 int retriesRemaining = maxRetries - retries;

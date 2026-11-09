@@ -97,7 +97,8 @@ response it is about to return. `EventServiceImpl` is a no-op returning `null` w
 Controllers call routes through `BaseRestController.requestBody(...)`, not `producerTemplate.requestBody`
 directly: the latter wraps service exceptions in a `CamelExecutionException`, the helper rethrows the original
 (via `Exchange.getException()`). `exceptions/RestExceptionHandler` (`@RestControllerAdvice`) then maps
-`ConsumerDownException` to HTTP 503; any other exception is still a generic 500.
+`ConsumerDownException` (consumer 503 or unreachable) and `SupplierDownException` (petstore 503) to HTTP 503; any other
+exception is still a generic 500.
 With the toggle on and no mock, the app needs the consumer running on 8081 — so the system-integration
 suite (below) requires it, or set `toggles.send-to-consumer=false`.
 
@@ -105,7 +106,9 @@ suite (below) requires it, or set `toggles.send-to-consumer=false`.
 loop (5 attempts, 2s apart) because the public petstore intermittently returns 500s. This is
 deliberate — see commits "debug 500 response from petstore api" and "fix nullpointer when petstore keeps
 responding with 500". When adding a service method, follow the same pattern *and* null-check the result
-after the loop before dereferencing it. The consumer call is *not* retried.
+after the loop before dereferencing it. First thing in each `catch`, call
+`SupplierDownException.throwIfServiceUnavailable(e)`: a petstore 503 is thrown immediately instead of retried.
+The consumer call is *not* retried.
 
 ## Test layers
 
