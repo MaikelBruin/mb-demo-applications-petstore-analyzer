@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public abstract class BaseTestConfiguration {
+public class BaseTestConfiguration {
 
     @ScenarioScope
     @Bean

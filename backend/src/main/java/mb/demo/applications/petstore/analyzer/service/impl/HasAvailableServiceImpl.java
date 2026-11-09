@@ -1,12 +1,12 @@
 package mb.demo.applications.petstore.analyzer.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import mb.demo.applications.petstore.analyzer.service.EventService;
 import mb.demo.applications.petstore.analyzer.service.HasAvailableService;
 import mb.demo.applications.petstore.analyzer.webapi.model.HasAvailableResponse;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.model.Pet;
-import mb.demos.openapi.generated.api.client.petstore.model.Tag;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,13 +16,15 @@ import java.util.List;
 public class HasAvailableServiceImpl implements HasAvailableService {
 
     private final PetApi petApi;
+    private final EventService eventService;
 
-    public HasAvailableServiceImpl(PetApi petApi) {
+    public HasAvailableServiceImpl(PetApi petApi, EventService eventService) {
         this.petApi = petApi;
+        this.eventService = eventService;
     }
 
     @Override
-    public HasAvailableResponse getHasAvailableRats() throws ApiException, InterruptedException {
+    public HasAvailableResponse getHasAvailableRats() throws ApiException, InterruptedException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -51,7 +53,8 @@ public class HasAvailableServiceImpl implements HasAvailableService {
                 .toList();
         boolean hasRats = !availableRats.isEmpty();
         hasAvailableResponse.setHasAvailable(hasRats);
-        return hasAvailableResponse;
 
+        eventService.processEvent("has-available", hasAvailableResponse);
+        return hasAvailableResponse;
     }
 }

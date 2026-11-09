@@ -1,7 +1,9 @@
-Feature: Petstore analyzer isolated tests
+Feature: Petstore analyzer system tests
 
   Background:
     Given I have access to the mocked petstore
+    And I configure default responses for the petstore
+    And I have access to the mocked consumer
 
     ################### same tests as integrated ##################################################
   Scenario: Get total number of dogs should not throw exception

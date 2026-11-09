@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -190,7 +190,12 @@
         <dependency>
             <groupId>mb.demos.openapi.generated.api.client</groupId>
             <artifactId>petstore</artifactId>
-            <version>1.0.27</version>
+            <version>1.0.27-default-672feffaaebfdf3e531b12ff3c359ceb079d48fa</version>
+        </dependency>
+        <dependency>
+            <groupId>mb.demos.openapi.generated.api.client</groupId>
+            <artifactId>petstore-analyzer-consumer</artifactId>
+            <version>1.1.1-default-b9bc4f6658106914c4fe91b845073a8131d6359e</version>
         </dependency>
         <!-- END GENERATED CLIENT -->
     </dependencies>
@@ -291,10 +296,8 @@
                 </executions>
                 <configuration>
                     <includes>
-                        <!-- Include your Cucumber runner class here for Failsafe if it's an IT -->
                         <include>**/*IntegrationTest.java</include>
-                        <!-- Or if your Cucumber runner is named differently, e.g., RunCucumberTest.java -->
-                        <include>**/*CucumberTest.java</include>
+                        <include>**/System*TestRunner.java</include>
                     </includes>
                     <properties>
                         <configurationParameters>
@@ -310,7 +313,7 @@
                     <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
-                        <exclude>**/*CucumberTest.java</exclude>
+                        <exclude>**/System*TestRunner.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

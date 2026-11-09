@@ -11,9 +11,13 @@ springdoc:
   api-docs:
     path: /api-docs
 
-
-
 services:
+  petstore-analyzer-consumer:
+    base-url: http://localhost:8081
+    connection-timeout: 20000
   petstore:
     base-url: https://petstore3.swagger.io/api/v3
     connection-timeout: 20000
+
+toggles:
+  send-to-consumer: true

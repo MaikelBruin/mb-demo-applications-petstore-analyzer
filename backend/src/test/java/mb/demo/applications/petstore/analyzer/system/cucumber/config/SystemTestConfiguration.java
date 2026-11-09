@@ -1,0 +1,21 @@
+package mb.demo.applications.petstore.analyzer.system.cucumber.config;
+
+import io.cucumber.spring.CucumberContextConfiguration;
+import mb.demo.applications.petstore.analyzer.base.ContainerBootstrapper;
+import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
+import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+@ActiveProfiles({"dev", "system", "test", "cucumber"})
+@CucumberContextConfiguration
+public class SystemTestConfiguration extends ContainerBootstrapper {
+
+    @MockitoBean
+    private PetApi petApi;
+
+    @MockitoBean
+    private EventsApi eventsApi;
+
+
+}

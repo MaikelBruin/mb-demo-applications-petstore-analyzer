@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.isolated.cucumber.config;
+package mb.demo.applications.petstore.analyzer.system.cucumber.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.platform.suite.api.ConfigurationParameter;
@@ -14,10 +14,10 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
  */
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("features/isolated")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "mb.demo.applications.petstore.analyzer.base,mb.demo.applications.petstore.analyzer.isolated")
+@SelectClasspathResource("features/system")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "mb.demo.applications.petstore.analyzer.base,mb.demo.applications.petstore.analyzer.system")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
 @Slf4j
-public class RunIsolatedCucumberTest {
+public class SystemTestRunner {
 
 }

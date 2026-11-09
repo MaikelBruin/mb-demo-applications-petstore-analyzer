@@ -1,6 +1,7 @@
 package mb.demo.applications.petstore.analyzer.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import mb.demo.applications.petstore.analyzer.service.EventService;
 import mb.demo.applications.petstore.analyzer.service.TotalsService;
 import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
@@ -15,13 +16,15 @@ import java.util.List;
 public class TotalsServiceImpl implements TotalsService {
 
     private final PetApi petApi;
+    private EventService eventService;
 
-    public TotalsServiceImpl(PetApi petApi) {
+    public TotalsServiceImpl(PetApi petApi, EventService eventService) {
         this.petApi = petApi;
+        this.eventService = eventService;
     }
 
     @Override
-    public TotalResponse getTotalNumberOfDogs() throws InterruptedException, ApiException {
+    public TotalResponse getTotalNumberOfDogs() throws InterruptedException, ApiException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -41,11 +44,12 @@ public class TotalsServiceImpl implements TotalsService {
 
         TotalResponse response = new TotalResponse();
         response.setTotal(dogs.size());
+        eventService.processEvent("total-dogs", response);
         return response;
     }
 
     @Override
-    public TotalResponse getTotalNumberOfCats() throws InterruptedException, ApiException {
+    public TotalResponse getTotalNumberOfCats() throws InterruptedException, ApiException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -65,11 +69,12 @@ public class TotalsServiceImpl implements TotalsService {
 
         TotalResponse response = new TotalResponse();
         response.setTotal(cats.size());
+        eventService.processEvent("total-cats", response);
         return response;
     }
 
     @Override
-    public TotalResponse getTotalNumberOfAvailablePets() throws InterruptedException, ApiException {
+    public TotalResponse getTotalNumberOfAvailablePets() throws InterruptedException, ApiException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -89,11 +94,12 @@ public class TotalsServiceImpl implements TotalsService {
 
         TotalResponse response = new TotalResponse();
         response.setTotal(available.size());
+        eventService.processEvent("total-available", response);
         return response;
     }
 
     @Override
-    public TotalResponse findTotalNumberOfPets(String tag) throws InterruptedException, ApiException {
+    public TotalResponse findTotalNumberOfPets(String tag) throws InterruptedException, ApiException, mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException {
         int retries = 0;
         int maxRetries = 5;
         int pollInterval = 2000;
@@ -113,6 +119,7 @@ public class TotalsServiceImpl implements TotalsService {
 
         TotalResponse response = new TotalResponse();
         response.setTotal(petsByTag.size());
+        eventService.processEvent("total-pets", response);
         return response;
     }
 }

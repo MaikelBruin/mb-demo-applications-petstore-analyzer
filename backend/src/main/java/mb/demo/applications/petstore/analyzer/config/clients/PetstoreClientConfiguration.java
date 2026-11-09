@@ -3,7 +3,6 @@ package mb.demo.applications.petstore.analyzer.config.clients;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mb.demo.applications.petstore.analyzer.utils.JerseyRequestFilter;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
-import mb.demos.openapi.generated.api.client.petstore.api.PetApiClient;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiClient;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -27,7 +26,7 @@ public class PetstoreClientConfiguration {
 
     @Bean
     public PetApi petApi(ObjectMapper objectMapper) {
-        return new PetApiClient(createApiClient(objectMapper));
+        return new PetApi(createApiClient(objectMapper));
     }
 
     private ApiClient createApiClient(ObjectMapper objectMapper) {

@@ -1,7 +1,6 @@
 package mb.demo.applications.petstore.analyzer.routes;
 
 import mb.demo.applications.petstore.analyzer.service.HasAvailableService;
-import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import mb.demo.applications.petstore.analyzer.webapi.model.HasAvailableResponse;
 import org.apache.camel.CamelContext;
 import org.springframework.stereotype.Component;
