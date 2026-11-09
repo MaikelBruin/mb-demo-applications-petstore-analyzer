@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.integrated.bootstrap;
+package mb.demo.applications.petstore.analyzer.systemintegration.bootstrap;
 
 import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.PetstoreAnalyzerApplication;
@@ -8,5 +8,5 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(classes = {PetstoreAnalyzerApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"dev", "test", "cucumber"})
 @Slf4j
-public class IntegratedContainerBootstrapper {
+public class SystemIntegrationTestContainerBootstrapper {
 }

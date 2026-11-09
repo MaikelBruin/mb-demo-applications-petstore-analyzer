@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.isolated;
+package mb.demo.applications.petstore.analyzer.system.cucumber.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class IsolatedTestMockData {
+public class SystemTestMockData {
 
     public static final HashMap<String, List<String>> DEFAULT_HEADERS = new HashMap<String, List<String>>() {
         {

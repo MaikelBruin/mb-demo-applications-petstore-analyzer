@@ -296,10 +296,8 @@
                 </executions>
                 <configuration>
                     <includes>
-                        <!-- Include your Cucumber runner class here for Failsafe if it's an IT -->
                         <include>**/*IntegrationTest.java</include>
-                        <!-- Or if your Cucumber runner is named differently, e.g., RunCucumberTest.java -->
-                        <include>**/*CucumberTest.java</include>
+                        <include>**/System*TestRunner.java</include>
                     </includes>
                     <properties>
                         <configurationParameters>
@@ -315,7 +313,7 @@
                     <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
-                        <exclude>**/*CucumberTest.java</exclude>
+                        <exclude>**/System*TestRunner.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.integrated.cucumber.steps;
+package mb.demo.applications.petstore.analyzer.systemintegration.cucumber.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
@@ -16,18 +16,18 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Slf4j
-public class IntegratedStepDefs extends BaseCucumberStepDefs {
+public class SystemIntegrationTestStepDefs extends BaseCucumberStepDefs {
 
     private final PetApi petApi;
     private final EventsApi eventsApi;
 
-    public IntegratedStepDefs(CamelContext camelContext,
-                              ProducerTemplate producerTemplate,
-                              TestDataHolder testDataHolder,
-                              ObjectMapper objectMapper,
-                              TestRestTemplate testRestTemplate,
-                              final PetApi petApi,
-                              final EventsApi eventsApi) {
+    public SystemIntegrationTestStepDefs(CamelContext camelContext,
+                                         ProducerTemplate producerTemplate,
+                                         TestDataHolder testDataHolder,
+                                         ObjectMapper objectMapper,
+                                         TestRestTemplate testRestTemplate,
+                                         final PetApi petApi,
+                                         final EventsApi eventsApi) {
         super(camelContext, producerTemplate, testDataHolder, objectMapper, testRestTemplate);
         this.petApi = petApi;
         this.eventsApi = eventsApi;

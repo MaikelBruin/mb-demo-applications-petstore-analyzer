@@ -1,4 +1,4 @@
-Feature: Petstore analyzer isolated tests
+Feature: Petstore analyzer system tests
 
   Background:
     Given I have access to the mocked petstore

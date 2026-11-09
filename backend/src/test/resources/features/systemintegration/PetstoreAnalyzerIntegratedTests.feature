@@ -1,10 +1,10 @@
-Feature: Petstore analyzer integrated tests
+Feature: Petstore analyzer system integration tests
 
   Background:
     Given I have access to the actual petstore
     And I have access to the actual consumer
 
-    ################### same tests as isolated ##################################################
+    ################### same tests as system tests ##################################################
 
   Scenario: Get total number of dogs should not throw exception
     When I get the total number of dogs
@@ -35,4 +35,4 @@ Feature: Petstore analyzer integrated tests
     When I get if there are any rats available
     Then the has available rats response should not be null
 
-    ################### END same tests as isolated ##################################################
+    ################### END same tests as system tests ##################################################
