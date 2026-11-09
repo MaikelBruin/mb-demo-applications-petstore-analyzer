@@ -22,6 +22,7 @@ import mb.demos.openapi.generated.api.client.petstore.model.Pet;
 import mb.demos.openapi.generated.api.client.petstore.model.Tag;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
+import org.assertj.core.api.Assertions;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -33,7 +34,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Slf4j
 public class SystemTestStepDefs extends BaseCucumberStepDefs {
@@ -59,17 +59,17 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     @Given("I have access to the mocked petstore")
     public void iHaveAccessToTheMockedPetstore() {
         log.info("I have access to the mocked petstore");
-        assertThat(petApi).isNotNull();
+        Assertions.assertThat(petApi).isNotNull();
         boolean isMock = Mockito.mockingDetails(petApi).isMock();
-        assertThat(isMock).isTrue();
+        Assertions.assertThat(isMock).isTrue();
     }
 
     @And("I have access to the mocked consumer")
     public void iHaveAccessToTheMockedConsumer() {
         log.info("I have access to the mocked consumer");
-        assertThat(eventsApi).isNotNull();
+        Assertions.assertThat(eventsApi).isNotNull();
         boolean isMock = Mockito.mockingDetails(eventsApi).isMock();
-        assertThat(isMock).isTrue();
+        Assertions.assertThat(isMock).isTrue();
     }
 
     @And("I configure default responses for the consumer")
@@ -108,7 +108,7 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
 
     @Then("the analyzer should have responded with HTTP status {int}")
     public void theAnalyzerShouldHaveRespondedWithHttpStatus(int expectedStatus) {
-        assertThat(lastHttpStatus).isEqualTo(expectedStatus);
+        Assertions.assertThat(lastHttpStatus).isEqualTo(expectedStatus);
     }
 
     /**
@@ -119,7 +119,7 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     public void theAnalyzerShouldHaveThrownAConsumerDownException() {
         ArgumentCaptor<ConsumerDownException> captor = ArgumentCaptor.forClass(ConsumerDownException.class);
         Mockito.verify(restExceptionHandler).handleConsumerDown(captor.capture());
-        assertThat(captor.getValue().getCode()).isEqualTo(503);
+        Assertions.assertThat(captor.getValue().getCode()).isEqualTo(503);
     }
 
     @SneakyThrows
