@@ -296,7 +296,7 @@
                 </executions>
                 <configuration>
                     <includes>
-                        <include>**/*IntegrationTest.java</include>
+                        <include>**/*IntegrationTests.java</include>
                         <include>**/System*TestRunner.java</include>
                     </includes>
                     <properties>
@@ -312,7 +312,7 @@
                 <configuration>
                     <forkedProcessExitTimeoutInSeconds>60</forkedProcessExitTimeoutInSeconds>
                     <excludes>
-                        <exclude>**/*IntegrationTest.java</exclude>
+                        <exclude>**/*IntegrationTests.java</exclude>
                         <exclude>**/System*TestRunner.java</exclude>
                     </excludes>
                 </configuration>

@@ -32,9 +32,9 @@ mvn -pl backend verify -Dit.test=SystemTestRunner \
   -Dcucumber.filter.name="Has available rats - no rats available"    # single scenario
 ```
 
-Surefire **excludes** `**/*IntegrationTest.java` and `**/System*TestRunner.java`; failsafe includes only
-those (`backend/pom.xml`). A new cucumber runner must therefore be named `System*TestRunner` (or
-`*IntegrationTest`) or it will never run under failsafe — and would run under surefire instead.
+Surefire **excludes** `**/*IntegrationTests.java` and `**/System*TestRunner.java`; failsafe includes only
+those (`backend/pom.xml`). A new cucumber runner must therefore be named `System*TestRunner`, and a new
+integration test class `*IntegrationTests`, or it will run under surefire instead of failsafe.
 
 Once running: Swagger UI at `/api`, OpenAPI JSON at `/api-docs`, actuator at `/actuator`.
 
@@ -109,11 +109,12 @@ after the loop before dereferencing it. The consumer call is *not* retried.
 
 ## Test layers
 
-Three layers, all under `backend/src/test/java/…/analyzer/`:
+Four layers, all under `backend/src/test/java/…/analyzer/`:
 
 | Layer | Location | Runner | Downstream clients |
 |---|---|---|---|
 | unit | `unit/` | surefire | n/a |
+| integration | `integration/` (`TotalsEndpointIntegrationTests`) | failsafe, `-Dit.test=TotalsEndpointIntegrationTests` | none reached: `TotalsService` (an application unit, not the generated clients) is a `@MockitoBean`; real controller + camel route + `RestExceptionHandler` via `MockMvc` |
 | system | `system/`, `features/system/` | `SystemTestRunner` | `PetApi` and `EventsApi` are `@MockitoBean`s |
 | system-integration | `systemintegration/`, `features/systemintegration/` | `SystemIntegrationTestRunner` | real public petstore (network, flaky) and the real consumer |
 
