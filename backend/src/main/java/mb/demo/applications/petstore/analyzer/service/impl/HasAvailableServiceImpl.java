@@ -4,12 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.service.EventService;
 import mb.demo.applications.petstore.analyzer.service.HasAvailableService;
 import mb.demo.applications.petstore.analyzer.webapi.model.HasAvailableResponse;
-import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
-import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventRequestBody;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.model.Pet;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

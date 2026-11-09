@@ -1,12 +1,12 @@
 package mb.demo.applications.petstore.analyzer.service.impl;
 
+import jakarta.ws.rs.ProcessingException;
 import mb.demo.applications.petstore.analyzer.exceptions.ConsumerDownException;
 import mb.demo.applications.petstore.analyzer.service.EventService;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventAcceptedResponse;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventRequestBody;
-import jakarta.ws.rs.ProcessingException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

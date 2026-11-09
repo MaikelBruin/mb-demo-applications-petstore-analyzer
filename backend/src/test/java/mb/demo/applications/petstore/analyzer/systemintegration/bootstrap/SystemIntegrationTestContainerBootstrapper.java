@@ -5,7 +5,7 @@ import mb.demo.applications.petstore.analyzer.PetstoreAnalyzerApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(classes = {PetstoreAnalyzerApplication.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {PetstoreAnalyzerApplication.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"dev", "test", "cucumber"})
 @Slf4j
 public class SystemIntegrationTestContainerBootstrapper {

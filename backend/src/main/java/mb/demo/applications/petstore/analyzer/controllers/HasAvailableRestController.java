@@ -2,8 +2,6 @@ package mb.demo.applications.petstore.analyzer.controllers;
 
 import mb.demo.applications.petstore.analyzer.routes.RouteBuilderConstants;
 import mb.demo.applications.petstore.analyzer.webapi.api.AvailableApi;
-import mb.demo.applications.petstore.analyzer.webapi.api.RatiosApi;
-import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import mb.demo.applications.petstore.analyzer.webapi.model.HasAvailableResponse;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.http.ResponseEntity;
