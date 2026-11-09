@@ -3,12 +3,17 @@ package mb.demo.applications.petstore.analyzer.system.cucumber.steps;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.base.cucumber.TestDataHolder;
 import mb.demo.applications.petstore.analyzer.base.cucumber.steps.BaseCucumberStepDefs;
+import mb.demo.applications.petstore.analyzer.exceptions.ConsumerDownException;
+import mb.demo.applications.petstore.analyzer.exceptions.RestExceptionHandler;
 import mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
+import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventRequestBody;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiResponse;
@@ -17,8 +22,10 @@ import mb.demos.openapi.generated.api.client.petstore.model.Pet;
 import mb.demos.openapi.generated.api.client.petstore.model.Tag;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -32,6 +39,8 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class SystemTestStepDefs extends BaseCucumberStepDefs {
     private final PetApi petApi;
     private final EventsApi eventsApi;
+    private final RestExceptionHandler restExceptionHandler;
+    private Integer lastHttpStatus;
 
     public SystemTestStepDefs(CamelContext camelContext,
                               ProducerTemplate producerTemplate,
@@ -39,10 +48,12 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
                               ObjectMapper objectMapper,
                               TestRestTemplate testRestTemplate,
                               final PetApi petApi,
-                              final EventsApi eventsApi) {
+                              final EventsApi eventsApi,
+                              final RestExceptionHandler restExceptionHandler) {
         super(camelContext, producerTemplate, testDataHolder, objectMapper, testRestTemplate);
         this.petApi = petApi;
         this.eventsApi = eventsApi;
+        this.restExceptionHandler = restExceptionHandler;
     }
 
     @Given("I have access to the mocked petstore")
@@ -59,6 +70,62 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
         assertThat(eventsApi).isNotNull();
         boolean isMock = Mockito.mockingDetails(eventsApi).isMock();
         assertThat(isMock).isTrue();
+    }
+
+    @And("I configure default responses for the consumer")
+    public void iConfigureDefaultResponsesForTheConsumer() {
+        Mockito.reset(eventsApi);
+        Mockito.reset(restExceptionHandler);
+    }
+
+    @SneakyThrows
+    @Given("I configured the consumer to respond with a teapot exception")
+    public void iConfiguredTheConsumerToRespondWithATeapotException() {
+        Mockito.when(eventsApi.processEvent(Mockito.any(EventRequestBody.class)))
+                .thenThrow(new mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException(418, "I'm a teapot"));
+    }
+
+    @SneakyThrows
+    @Given("I configured the consumer to respond with a service unavailable exception")
+    public void iConfiguredTheConsumerToRespondWithAServiceUnavailableException() {
+        Mockito.when(eventsApi.processEvent(Mockito.any(EventRequestBody.class)))
+                .thenThrow(new mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException(503, "Service Unavailable"));
+    }
+
+    /**
+     * The shared 'I get the total number of dogs' step can not be used for error responses: the rest template throws
+     * on 4xx/5xx. Over HTTP only the mapped status is visible, not the exception type: use
+     * 'the analyzer should have thrown a ConsumerDownException' to check that.
+     */
+    @When("I get the total number of dogs and capture the HTTP status")
+    public void iGetTheTotalNumberOfDogsAndCaptureTheHttpStatus() {
+        try {
+            lastHttpStatus = testRestTemplate.getForEntity("/api/totals/dogs", String.class).getStatusCode().value();
+        } catch (RestClientResponseException e) {
+            lastHttpStatus = e.getStatusCode().value();
+        }
+    }
+
+    @Then("the analyzer should have responded with HTTP status {int}")
+    public void theAnalyzerShouldHaveRespondedWithHttpStatus(int expectedStatus) {
+        assertThat(lastHttpStatus).isEqualTo(expectedStatus);
+    }
+
+    /**
+     * Spring only calls RestExceptionHandler.handleConsumerDown for a ConsumerDownException, so a recorded call with
+     * that argument proves which exception type the analyzer threw.
+     */
+    @Then("the analyzer should have thrown a ConsumerDownException")
+    public void theAnalyzerShouldHaveThrownAConsumerDownException() {
+        ArgumentCaptor<ConsumerDownException> captor = ArgumentCaptor.forClass(ConsumerDownException.class);
+        Mockito.verify(restExceptionHandler).handleConsumerDown(captor.capture());
+        assertThat(captor.getValue().getCode()).isEqualTo(503);
+    }
+
+    @SneakyThrows
+    @Then("the consumer should have received an event of type {string}")
+    public void theConsumerShouldHaveReceivedAnEventOfType(String eventType) {
+        Mockito.verify(eventsApi).processEvent(Mockito.argThat(body -> eventType.equals(body.getEventType())));
     }
 
     @SneakyThrows

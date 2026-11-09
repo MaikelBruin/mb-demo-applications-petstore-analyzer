@@ -23,7 +23,7 @@ public class HasAvailableRestController extends BaseRestController implements Av
             produces = {"application/json"}
     )
     public ResponseEntity<HasAvailableResponse> getHasAvailableRats() {
-        final HasAvailableResponse hasAvailableResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_HAS_AVAILABLE_RATS, null, HasAvailableResponse.class);
+        final HasAvailableResponse hasAvailableResponse = requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_HAS_AVAILABLE_RATS, null, HasAvailableResponse.class);
         return ResponseEntity.ok(hasAvailableResponse);
     }
 }

@@ -4,8 +4,9 @@ Feature: Petstore analyzer system tests
     Given I have access to the mocked petstore
     And I configure default responses for the petstore
     And I have access to the mocked consumer
+    And I configure default responses for the consumer
 
-    ################### same tests as integrated ##################################################
+    ################### same tests as system integration tests ##################################################
   Scenario: Get total number of dogs should not throw exception
     When I get the total number of dogs
     Then the total number of dogs response should not be null
@@ -30,7 +31,7 @@ Feature: Petstore analyzer system tests
     When I get if there are any rats available
     Then the has available rats response should not be null
 
-    ################### END same tests as integrated ##################################################
+    ################### END same tests as system integration tests ##################################################
 
   Scenario: Availability ratio - Division by zero should result not result in exception
     Given I configured the petstore find pets by status "sold" response to return an empty array
@@ -48,3 +49,17 @@ Feature: Petstore analyzer system tests
     When I get if there are any rats available
     Then the has available rats response should not be null
     And the has available rats response should say that there are "" rats available
+
+  Scenario: Consumer responds with a teapot exception - exception is not thrown by the analyzer
+    Given I configured the consumer to respond with a teapot exception
+    When I get the total number of dogs
+    Then the consumer should have received an event of type "total-dogs"
+    And the total number of dogs response should not be null
+    And the total number of dogs should be equal than or greater than 0
+
+  Scenario: Consumer responds with 503 service unavailable - ConsumerDownException results in a 503 from the analyzer
+    Given I configured the consumer to respond with a service unavailable exception
+    When I get the total number of dogs and capture the HTTP status
+    Then the analyzer should have responded with HTTP status 503
+    And the analyzer should have thrown a ConsumerDownException
+    And the consumer should have received an event of type "total-dogs"

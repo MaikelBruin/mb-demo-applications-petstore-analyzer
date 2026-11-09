@@ -22,7 +22,7 @@ public class EventServiceImpl implements EventService {
     @Value("${toggles.send-to-consumer}")
     private boolean sendToConsumer;
 
-    private EventsApi eventsApi;
+    private final EventsApi eventsApi;
 
     public EventServiceImpl(EventsApi eventsApi) {
         this.eventsApi = eventsApi;

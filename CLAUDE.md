@@ -94,6 +94,10 @@ response it is about to return. `EventServiceImpl` is a no-op returning `null` w
   Jersey client throws this *unchecked*, not an `ApiException`) → `ConsumerDownException` (extends the
   consumer client's `ApiException`, code 503);
 - anything else → `RuntimeException`.
+Controllers call routes through `BaseRestController.requestBody(...)`, not `producerTemplate.requestBody`
+directly: the latter wraps service exceptions in a `CamelExecutionException`, the helper rethrows the original
+(via `Exchange.getException()`). `exceptions/RestExceptionHandler` (`@RestControllerAdvice`) then maps
+`ConsumerDownException` to HTTP 503; any other exception is still a generic 500.
 With the toggle on and no mock, the app needs the consumer running on 8081 — so the system-integration
 suite (below) requires it, or set `toggles.send-to-consumer=false`.
 

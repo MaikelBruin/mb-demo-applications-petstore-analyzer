@@ -26,7 +26,7 @@ public class TotalsRestController extends BaseRestController implements TotalsAp
             produces = {"application/json"}
     )
     public ResponseEntity<TotalResponse> getTotalNumberOfCats() {
-        final TotalResponse totalResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_CATS, null, TotalResponse.class);
+        final TotalResponse totalResponse = requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_CATS, null, TotalResponse.class);
         return ResponseEntity.ok(totalResponse);
     }
 
@@ -37,7 +37,7 @@ public class TotalsRestController extends BaseRestController implements TotalsAp
             produces = {"application/json"}
     )
     public ResponseEntity<TotalResponse> getTotalNumberOfDogs() {
-        final TotalResponse totalResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_DOGS, null, TotalResponse.class);
+        final TotalResponse totalResponse = requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_DOGS, null, TotalResponse.class);
         return ResponseEntity.ok(totalResponse);
     }
 
@@ -48,7 +48,7 @@ public class TotalsRestController extends BaseRestController implements TotalsAp
             produces = {"application/json"}
     )
     public ResponseEntity<TotalResponse> getTotalNumberOfAvailablePets() {
-        final TotalResponse totalResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_AVAILABLE, null, TotalResponse.class);
+        final TotalResponse totalResponse = requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_TOTAL_AVAILABLE, null, TotalResponse.class);
         return ResponseEntity.ok(totalResponse);
     }
 
@@ -62,7 +62,7 @@ public class TotalsRestController extends BaseRestController implements TotalsAp
         final Map<String, Object> params = new HashMap<>();
         params.put("tag", tag);
 
-        final TotalResponse totalResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_FIND_TOTAL, params, TotalResponse.class);
+        final TotalResponse totalResponse = requestBody(RouteBuilderConstants.DIRECT_ROUTE_FIND_TOTAL, params, TotalResponse.class);
         return ResponseEntity.ok(totalResponse);
     }
 }

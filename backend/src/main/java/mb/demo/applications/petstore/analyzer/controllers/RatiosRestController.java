@@ -23,7 +23,7 @@ public class RatiosRestController extends BaseRestController implements RatiosAp
             produces = {"application/json"}
     )
     public ResponseEntity<AvailabilityRatioResponse> getPetAvailabilityRatio() {
-        final AvailabilityRatioResponse availabilityRatioResponse = producerTemplate.requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_AVAILABILITY_RATIO, null, AvailabilityRatioResponse.class);
+        final AvailabilityRatioResponse availabilityRatioResponse = requestBody(RouteBuilderConstants.DIRECT_ROUTE_GET_AVAILABILITY_RATIO, null, AvailabilityRatioResponse.class);
         return ResponseEntity.ok(availabilityRatioResponse);
     }
 }
