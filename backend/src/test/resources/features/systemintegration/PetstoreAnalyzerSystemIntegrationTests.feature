@@ -35,6 +35,7 @@ Feature: Petstore analyzer system integration tests
     When I get if there are any rats available
     Then the has available rats response should not be null
 
+    @using-spy
   Scenario: Consumer should be notified for each analysis done
     When I get if there are any rats available
     And I get the ratio of available pets vs sold pets

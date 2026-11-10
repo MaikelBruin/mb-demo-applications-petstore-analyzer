@@ -45,6 +45,7 @@ public class EventServiceImpl implements EventService {
             if (e.getCode() == 418) {
                 return new EventAcceptedResponse().eventId(UUID.randomUUID()).receivedAt(Date.from(Instant.now()));
             }
+            //service unavailable
             if (e.getCode() == 503) {
                 throw new ConsumerDownException("Petstore analyzer consumer is down");
             }
