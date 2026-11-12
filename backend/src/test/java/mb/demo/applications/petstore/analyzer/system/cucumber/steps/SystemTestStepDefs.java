@@ -231,4 +231,10 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
         Mockito.doReturn(SystemTestMockData.uploadFileResponseExample).when(petApi).uploadFile(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(File.class));
 
     }
+
+    @SneakyThrows
+    @Then("the consumer should be notified {int} times")
+    public void theConsumerShouldBeNotifiedTimes(int expectedNumberOfNotifications) {
+        Mockito.verify(eventsApi, Mockito.times(expectedNumberOfNotifications)).processEvent(Mockito.any(EventRequestBody.class));
+    }
 }

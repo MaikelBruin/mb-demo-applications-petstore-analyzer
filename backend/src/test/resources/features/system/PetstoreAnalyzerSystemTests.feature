@@ -50,24 +50,35 @@ Feature: Petstore analyzer system tests
     Then the has available rats response should not be null
     And the has available rats response should say that there are "" rats available
 
-  Scenario: Consumer responds with a teapot exception - exception is not thrown by the analyzer
-    Given I configured the consumer to respond with a teapot exception
-    When I get the total number of dogs
-    Then the consumer should have received an event of type "total-dogs"
-    And the total number of dogs response should not be null
-    And the total number of dogs should be equal than or greater than 0
+    ############## new application requirements ###########################
 
-  Scenario: Consumer responds with 503 service unavailable - ConsumerDownException results in a 503 from the analyzer
-    Given I configured the consumer to respond with a service unavailable exception
-    When I get the total number of dogs and capture the HTTP status
-    Then the analyzer should have responded with HTTP status 503
-    And the analyzer should have thrown a ConsumerDownException
-    And the error message of the response should be "Petstore analyzer consumer is down"
+  Scenario: 1. Consumer should be notified for each analysis done
+    When I get if there are any rats available
+    And I get the ratio of available pets vs sold pets
+    And I get the total number of available pets
+    And I get the total number of pets with tag "rat"
+    Then the consumer should be notified 4 times
 
-  Scenario: Petstore responds with 503 service unavailable - SupplierDownException results in a 503 from the analyzer
+  Scenario: 2. Petstore 503 should result in SupplierDownException
     Given I configured the petstore to respond with a service unavailable exception
     When I get the total number of dogs and capture the HTTP status
     Then the analyzer should have responded with HTTP status 503
     And the analyzer should have thrown a SupplierDownException
     And the error message of the response should be "Petstore supplier is down"
     And the consumer should not have received any event
+
+  Scenario: 3. Consumer 503 should result in ConsumerDownException
+    Given I configured the consumer to respond with a service unavailable exception
+    When I get the total number of dogs and capture the HTTP status
+    Then the analyzer should have responded with HTTP status 503
+    And the analyzer should have thrown a ConsumerDownException
+    And the error message of the response should be "Petstore analyzer consumer is down"
+
+  Scenario: 4. Consumer 418 should be ignored
+    Given I configured the consumer to respond with a teapot exception
+    When I get the total number of dogs
+    Then the consumer should have received an event of type "total-dogs"
+    And the total number of dogs response should not be null
+    And the total number of dogs should be equal than or greater than 0
+
+    ############## END new application requirements ###########################
