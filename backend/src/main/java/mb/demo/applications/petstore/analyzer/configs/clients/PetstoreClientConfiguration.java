@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.config.clients;
+package mb.demo.applications.petstore.analyzer.configs.clients;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import mb.demo.applications.petstore.analyzer.utils.JerseyRequestFilter;

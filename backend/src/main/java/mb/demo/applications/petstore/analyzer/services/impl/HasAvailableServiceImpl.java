@@ -1,8 +1,9 @@
-package mb.demo.applications.petstore.analyzer.service.impl;
+package mb.demo.applications.petstore.analyzer.services.impl;
 
+import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
 import lombok.extern.slf4j.Slf4j;
-import mb.demo.applications.petstore.analyzer.service.EventService;
-import mb.demo.applications.petstore.analyzer.service.HasAvailableService;
+import mb.demo.applications.petstore.analyzer.services.EventService;
+import mb.demo.applications.petstore.analyzer.services.HasAvailableService;
 import mb.demo.applications.petstore.analyzer.webapi.model.HasAvailableResponse;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
@@ -34,6 +35,7 @@ public class HasAvailableServiceImpl implements HasAvailableService {
             try {
                 rats = petApi.findPetsByTags(List.of("rat", "rats"));
             } catch (Exception e) {
+                SupplierDownException.throwIfServiceUnavailable(e);
                 retries++;
                 int retriesRemaining = maxRetries - retries;
                 log.warn("retrieving pets with tags failed, retrying another '{}' times... message: '{}'", retriesRemaining, e.getMessage());

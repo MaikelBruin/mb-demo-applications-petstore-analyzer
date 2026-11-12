@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.service;
+package mb.demo.applications.petstore.analyzer.services;
 
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventAcceptedResponse;

@@ -1,6 +1,6 @@
 package mb.demo.applications.petstore.analyzer.routes;
 
-import mb.demo.applications.petstore.analyzer.service.TotalsService;
+import mb.demo.applications.petstore.analyzer.services.TotalsService;
 import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
 import org.apache.camel.CamelContext;
 import org.springframework.stereotype.Component;

@@ -35,4 +35,12 @@ Feature: Petstore analyzer system integration tests
     When I get if there are any rats available
     Then the has available rats response should not be null
 
+    @using-spy
+  Scenario: Consumer should be notified for each analysis done
+    When I get if there are any rats available
+    And I get the ratio of available pets vs sold pets
+    And I get the total number of available pets
+    And I get the total number of pets with tag "rat"
+    Then the consumer should be notified 4 times
+
     ################### END same tests as system tests ##################################################

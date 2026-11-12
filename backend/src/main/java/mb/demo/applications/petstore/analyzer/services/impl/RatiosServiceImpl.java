@@ -1,8 +1,9 @@
-package mb.demo.applications.petstore.analyzer.service.impl;
+package mb.demo.applications.petstore.analyzer.services.impl;
 
+import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
 import lombok.extern.slf4j.Slf4j;
-import mb.demo.applications.petstore.analyzer.service.EventService;
-import mb.demo.applications.petstore.analyzer.service.RatiosService;
+import mb.demo.applications.petstore.analyzer.services.EventService;
+import mb.demo.applications.petstore.analyzer.services.RatiosService;
 import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
@@ -36,6 +37,7 @@ public class RatiosServiceImpl implements RatiosService {
             try {
                 availablePets = petApi.findPetsByStatus(Pet.StatusEnum.AVAILABLE.getValue());
             } catch (Exception e) {
+                SupplierDownException.throwIfServiceUnavailable(e);
                 retries++;
                 int retriesRemaining = maxRetries - retries;
                 log.warn("retrieving available pets failed, retrying another '{}' times... message: '{}'", retriesRemaining, e.getMessage());
@@ -48,6 +50,7 @@ public class RatiosServiceImpl implements RatiosService {
             try {
                 soldPets = petApi.findPetsByStatus(Pet.StatusEnum.SOLD.getValue());
             } catch (Exception e) {
+                SupplierDownException.throwIfServiceUnavailable(e);
                 retries++;
                 int retriesRemaining = maxRetries - retries;
                 log.warn("retrieving sold pets failed, retrying another '{}' times... message: '{}'", retriesRemaining, e.getMessage());

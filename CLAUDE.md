@@ -32,9 +32,9 @@ mvn -pl backend verify -Dit.test=SystemTestRunner \
   -Dcucumber.filter.name="Has available rats - no rats available"    # single scenario
 ```
 
-Surefire **excludes** `**/*IntegrationTest.java` and `**/System*TestRunner.java`; failsafe includes only
-those (`backend/pom.xml`). A new cucumber runner must therefore be named `System*TestRunner` (or
-`*IntegrationTest`) or it will never run under failsafe — and would run under surefire instead.
+Surefire **excludes** `**/*IntegrationTests.java` and `**/System*TestRunner.java`; failsafe includes only
+those (`backend/pom.xml`). A new cucumber runner must therefore be named `System*TestRunner`, and a new
+integration test class `*IntegrationTests`, or it will run under surefire instead of failsafe.
 
 Once running: Swagger UI at `/api`, OpenAPI JSON at `/api-docs`, actuator at `/actuator`.
 
@@ -94,6 +94,11 @@ response it is about to return. `EventServiceImpl` is a no-op returning `null` w
   Jersey client throws this *unchecked*, not an `ApiException`) → `ConsumerDownException` (extends the
   consumer client's `ApiException`, code 503);
 - anything else → `RuntimeException`.
+Controllers call routes through `BaseRestController.requestBody(...)`, not `producerTemplate.requestBody`
+directly: the latter wraps service exceptions in a `CamelExecutionException`, the helper rethrows the original
+(via `Exchange.getException()`). `exceptions/RestExceptionHandler` (`@RestControllerAdvice`) then maps
+`ConsumerDownException` (consumer 503 or unreachable) and `SupplierDownException` (petstore 503) to HTTP 503; any other
+exception is still a generic 500.
 With the toggle on and no mock, the app needs the consumer running on 8081 — so the system-integration
 suite (below) requires it, or set `toggles.send-to-consumer=false`.
 
@@ -101,15 +106,18 @@ suite (below) requires it, or set `toggles.send-to-consumer=false`.
 loop (5 attempts, 2s apart) because the public petstore intermittently returns 500s. This is
 deliberate — see commits "debug 500 response from petstore api" and "fix nullpointer when petstore keeps
 responding with 500". When adding a service method, follow the same pattern *and* null-check the result
-after the loop before dereferencing it. The consumer call is *not* retried.
+after the loop before dereferencing it. First thing in each `catch`, call
+`SupplierDownException.throwIfServiceUnavailable(e)`: a petstore 503 is thrown immediately instead of retried.
+The consumer call is *not* retried.
 
 ## Test layers
 
-Three layers, all under `backend/src/test/java/…/analyzer/`:
+Four layers, all under `backend/src/test/java/…/analyzer/`:
 
 | Layer | Location | Runner | Downstream clients |
 |---|---|---|---|
 | unit | `unit/` | surefire | n/a |
+| integration | `integration/` (`TotalsEndpointIntegrationTests`) | failsafe, `-Dit.test=TotalsEndpointIntegrationTests` | none reached: `TotalsService` (an application unit, not the generated clients) is a `@MockitoBean`; real controller + camel route + `RestExceptionHandler` via `MockMvc` |
 | system | `system/`, `features/system/` | `SystemTestRunner` | `PetApi` and `EventsApi` are `@MockitoBean`s |
 | system-integration | `systemintegration/`, `features/systemintegration/` | `SystemIntegrationTestRunner` | real public petstore (network, flaky) and the real consumer |
 
