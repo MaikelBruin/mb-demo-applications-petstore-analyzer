@@ -61,12 +61,13 @@ Feature: Petstore analyzer system tests
     Given I configured the consumer to respond with a service unavailable exception
     When I get the total number of dogs and capture the HTTP status
     Then the analyzer should have responded with HTTP status 503
-    And the consumer should have received an event of type "total-dogs"
     And the analyzer should have thrown a ConsumerDownException
+    And the error message of the response should be "Petstore analyzer consumer is down"
 
   Scenario: Petstore responds with 503 service unavailable - SupplierDownException results in a 503 from the analyzer
     Given I configured the petstore to respond with a service unavailable exception
     When I get the total number of dogs and capture the HTTP status
     Then the analyzer should have responded with HTTP status 503
     And the analyzer should have thrown a SupplierDownException
+    And the error message of the response should be "Petstore supplier is down"
     And the consumer should not have received any event

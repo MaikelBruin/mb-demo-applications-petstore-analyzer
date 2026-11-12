@@ -27,6 +27,7 @@ import org.assertj.core.api.Assertions;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.io.File;
@@ -42,6 +43,7 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     private final EventsApi eventsApi;
     private final RestExceptionHandler restExceptionHandler;
     private Integer lastHttpStatus;
+    private String lastHttpBody;
 
     public SystemTestStepDefs(CamelContext camelContext,
                               ProducerTemplate producerTemplate,
@@ -107,10 +109,23 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     @When("I get the total number of dogs and capture the HTTP status")
     public void iGetTheTotalNumberOfDogsAndCaptureTheHttpStatus() {
         try {
-            lastHttpStatus = testRestTemplate.getForEntity("/api/totals/dogs", String.class).getStatusCode().value();
+            ResponseEntity<String> response = testRestTemplate.getForEntity("/api/totals/dogs", String.class);
+            lastHttpStatus = response.getStatusCode().value();
+            lastHttpBody = response.getBody();
         } catch (RestClientResponseException e) {
             lastHttpStatus = e.getStatusCode().value();
+            lastHttpBody = e.getResponseBodyAsString();
         }
+    }
+
+    /**
+     * The message of the exception is what an API caller gets as the 'detail' of the error response (a ProblemDetail).
+     */
+    @SneakyThrows
+    @Then("the error message of the response should be {string}")
+    public void theErrorMessageOfTheResponseShouldBe(String expectedMessage) {
+        Assertions.assertThat(lastHttpBody).as("response body").isNotBlank();
+        Assertions.assertThat(objectMapper.readTree(lastHttpBody).path("detail").asText()).isEqualTo(expectedMessage);
     }
 
     @Then("the analyzer should have responded with HTTP status {int}")

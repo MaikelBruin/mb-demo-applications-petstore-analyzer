@@ -39,6 +39,7 @@ public class MockitoExampleUnitTests {
 
     /**
      * Stubbing: tell the mock what to return when a method is called with specific arguments.
+     * Verification: check the amount of invocations of the mock for specific arguments
      */
     @Test
     void stubbing_returnsTheConfiguredValueForTheConfiguredArgument() {
@@ -47,6 +48,13 @@ public class MockitoExampleUnitTests {
 
         assertThat(list.get(0)).isEqualTo("first");
         assertThat(list.get(1)).isNull(); // not stubbed for argument 1
+
+        Mockito.when(list.get(1)).thenReturn("second");
+        assertThat(list.get(1)).isEqualTo("second");
+
+        Mockito.verify(list, Mockito.times(1)).get(0);
+        Mockito.verify(list, Mockito.times(2)).get(1);
+        Mockito.verify(list, Mockito.times(3)).get(Mockito.anyInt());
     }
 
     /**

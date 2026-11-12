@@ -76,15 +76,19 @@ class TotalsEndpointIntegrationTests {
 
     /**
      * Exceptions without a mapping are not handled by the application. MockMvc has no servlet container to turn them
-     * into a 500 response (a real server does), so they surface as the cause of a ServletException. The cause being the
-     * original exception shows that it is not wrapped in a camel exception on its way back through the route.
+     * into a 500 response (a real server does), so they surface in a ServletException. The original exception is its
+     * root cause, which shows that it is not wrapped in a camel exception on its way back through the route.
+     * <p>
+     * Note that it is not the direct cause: the controller is proxied for bean validation, and that proxy wraps checked
+     * exceptions that the controller method does not declare in an UndeclaredThrowableException. The exception
+     * handler still finds the original, because Spring looks through the whole cause chain.
      */
     @Test
     void otherServiceExceptions_areNotMapped_andReachTheServletAsTheOriginalException() throws Exception {
         Mockito.when(totalsService.getTotalNumberOfDogs()).thenThrow(new ApiException("Could not retrieve pets"));
 
         assertThatThrownBy(() -> mockMvc.perform(get("/api/totals/dogs")))
-                .hasCauseInstanceOf(ApiException.class)
+                .hasRootCauseInstanceOf(ApiException.class)
                 .hasRootCauseMessage("Could not retrieve pets");
     }
 }
