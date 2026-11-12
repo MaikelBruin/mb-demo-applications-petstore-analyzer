@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.config;
+package mb.demo.applications.petstore.analyzer.configs;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;

@@ -52,9 +52,9 @@ public class MockitoExampleUnitTests {
         Mockito.when(list.get(1)).thenReturn("second");
         assertThat(list.get(1)).isEqualTo("second");
 
+        Mockito.verify(list, Mockito.times(3)).get(Mockito.anyInt());
         Mockito.verify(list, Mockito.times(1)).get(0);
         Mockito.verify(list, Mockito.times(2)).get(1);
-        Mockito.verify(list, Mockito.times(3)).get(Mockito.anyInt());
     }
 
     /**

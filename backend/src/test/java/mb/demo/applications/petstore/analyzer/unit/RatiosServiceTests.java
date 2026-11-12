@@ -2,9 +2,9 @@ package mb.demo.applications.petstore.analyzer.unit;
 
 import mb.demo.applications.petstore.analyzer.exceptions.ConsumerDownException;
 import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
-import mb.demo.applications.petstore.analyzer.service.EventService;
-import mb.demo.applications.petstore.analyzer.service.RatiosService;
-import mb.demo.applications.petstore.analyzer.service.impl.RatiosServiceImpl;
+import mb.demo.applications.petstore.analyzer.services.EventService;
+import mb.demo.applications.petstore.analyzer.services.RatiosService;
+import mb.demo.applications.petstore.analyzer.services.impl.RatiosServiceImpl;
 import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;

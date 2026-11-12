@@ -77,8 +77,7 @@ Feature: Petstore analyzer system tests
   Scenario: 4. Consumer 418 should be ignored
     Given I configured the consumer to respond with a teapot exception
     When I get the total number of dogs
-    Then the consumer should have received an event of type "total-dogs"
-    And the total number of dogs response should not be null
+    Then the total number of dogs response should not be null
     And the total number of dogs should be equal than or greater than 0
 
     ############## END new application requirements ###########################

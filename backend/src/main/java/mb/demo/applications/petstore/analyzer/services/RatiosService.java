@@ -1,4 +1,4 @@
-package mb.demo.applications.petstore.analyzer.service;
+package mb.demo.applications.petstore.analyzer.services;
 
 import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;

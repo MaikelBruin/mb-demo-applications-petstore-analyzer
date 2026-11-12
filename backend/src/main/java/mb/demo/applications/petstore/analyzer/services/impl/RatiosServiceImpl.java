@@ -1,9 +1,9 @@
-package mb.demo.applications.petstore.analyzer.service.impl;
+package mb.demo.applications.petstore.analyzer.services.impl;
 
 import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
 import lombok.extern.slf4j.Slf4j;
-import mb.demo.applications.petstore.analyzer.service.EventService;
-import mb.demo.applications.petstore.analyzer.service.RatiosService;
+import mb.demo.applications.petstore.analyzer.services.EventService;
+import mb.demo.applications.petstore.analyzer.services.RatiosService;
 import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResponse;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;

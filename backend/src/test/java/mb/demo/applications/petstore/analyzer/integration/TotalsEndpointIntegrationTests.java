@@ -2,7 +2,7 @@ package mb.demo.applications.petstore.analyzer.integration;
 
 import mb.demo.applications.petstore.analyzer.PetstoreAnalyzerApplication;
 import mb.demo.applications.petstore.analyzer.exceptions.ConsumerDownException;
-import mb.demo.applications.petstore.analyzer.service.TotalsService;
+import mb.demo.applications.petstore.analyzer.services.TotalsService;
 import mb.demo.applications.petstore.analyzer.webapi.model.TotalResponse;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
 import org.junit.jupiter.api.Test;
