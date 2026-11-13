@@ -141,4 +141,10 @@ public class PetstoreAnalyzerStepDefs extends BaseCucumberStepDefs {
         if (no.isEmpty()) assertThat(testDataHolder.getHasAvailableResponse().getHasAvailable()).isTrue();
         else assertThat(testDataHolder.getHasAvailableResponse().getHasAvailable()).isFalse();
     }
+
+    @And("the availability ratio should be equal to {int}")
+    public void theAvailabilityRatioShouldBeEqualTo(int expectedRatio) {
+        BigDecimal actual = testDataHolder.getAvailabilityRatioResponse().getRatio();
+        assertThat(actual).isEqualTo(BigDecimal.valueOf(expectedRatio));
+    }
 }

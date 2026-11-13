@@ -29,12 +29,25 @@ public class MockitoExampleUnitTests {
      */
     @Test
     void mock_returnsDefaultValuesWhenNothingIsStubbed() {
-        List<String> list = Mockito.mock(List.class);
+        List<String> mockedList = Mockito.mock(List.class);
 
-        assertThat(list.size()).isZero();
-        assertThat(list.isEmpty()).isFalse();
-        assertThat(list.get(0)).isNull();
-        assertThat(list.subList(0, 1)).isEmpty();
+        assertThat(mockedList.size()).isZero();
+        assertThat(mockedList.isEmpty()).isFalse();
+        assertThat(mockedList.get(0)).isNull();
+        assertThat(mockedList.subList(0, 3)).isEmpty();
+    }
+
+    @Test
+    void mock_doesNotExecuteActualMethods() {
+        List<String> realList = new ArrayList<>();
+        realList.add("foo");
+        realList.add("bar");
+        assertThat(realList.size()).isEqualTo(2);
+
+        List<String> mockedList = Mockito.mock(List.class);
+        mockedList.add("foo");
+        mockedList.add("bar");
+        assertThat(mockedList.size()).isZero();
     }
 
     /**
