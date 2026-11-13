@@ -9,6 +9,7 @@ import mb.demo.applications.petstore.analyzer.webapi.model.AvailabilityRatioResp
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.model.Pet;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,8 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Example unit tests: {@link RatiosServiceImpl} is tested in isolation, both of its collaborators are mocked.
@@ -44,9 +43,9 @@ public class RatiosServiceTests {
 
         AvailabilityRatioResponse response = ratiosService.getPetAvailabilityRatio();
 
-        assertThat(response.getAvailablePets()).isEqualTo(6);
-        assertThat(response.getSoldPets()).isEqualTo(4);
-        assertThat(response.getRatio()).isEqualByComparingTo(new BigDecimal("1.5"));
+        Assertions.assertThat(response.getAvailablePets()).isEqualTo(6);
+        Assertions.assertThat(response.getSoldPets()).isEqualTo(4);
+        Assertions.assertThat(response.getRatio()).isEqualByComparingTo(new BigDecimal("1.5"));
     }
 
     @Test
@@ -56,7 +55,7 @@ public class RatiosServiceTests {
 
         AvailabilityRatioResponse response = ratiosService.getPetAvailabilityRatio();
 
-        assertThat(response.getRatio()).isEqualByComparingTo(BigDecimal.ZERO);
+        Assertions.assertThat(response.getRatio()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 
     /**
@@ -85,8 +84,8 @@ public class RatiosServiceTests {
     void petstoreRespondsWith503_supplierDownExceptionIsThrownWithoutRetry() throws Exception {
         Mockito.when(petApi.findPetsByStatus("available")).thenThrow(new ApiException(503, "Service Unavailable"));
 
-        assertThatThrownBy(() -> ratiosService.getPetAvailabilityRatio())
-                .isInstanceOfSatisfying(SupplierDownException.class, e -> assertThat(e.getCode()).isEqualTo(503));
+        Assertions.assertThatThrownBy(() -> ratiosService.getPetAvailabilityRatio())
+                .isInstanceOfSatisfying(SupplierDownException.class, e -> Assertions.assertThat(e.getCode()).isEqualTo(503));
 
         Mockito.verify(petApi, Mockito.times(1)).findPetsByStatus(Mockito.anyString());
         Mockito.verifyNoInteractions(eventService);
@@ -98,7 +97,7 @@ public class RatiosServiceTests {
         Mockito.when(eventService.processEvent(Mockito.anyString(), Mockito.any()))
                 .thenThrow(new ConsumerDownException("consumer is down"));
 
-        assertThatThrownBy(() -> ratiosService.getPetAvailabilityRatio()).isInstanceOf(ConsumerDownException.class);
+        Assertions.assertThatThrownBy(() -> ratiosService.getPetAvailabilityRatio()).isInstanceOf(ConsumerDownException.class);
     }
 
     /**
@@ -114,7 +113,7 @@ public class RatiosServiceTests {
 
         AvailabilityRatioResponse response = ratiosService.getPetAvailabilityRatio();
 
-        assertThat(response.getAvailablePets()).isEqualTo(3);
+        Assertions.assertThat(response.getAvailablePets()).isEqualTo(3);
         Mockito.verify(petApi, Mockito.times(2)).findPetsByStatus("available");
     }
 

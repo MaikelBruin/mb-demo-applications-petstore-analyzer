@@ -1,5 +1,6 @@
 package mb.demo.applications.petstore.analyzer.unit;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -10,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Very basic Mockito examples that only use classes from the JDK, so there is nothing to know about the application
@@ -31,10 +30,10 @@ public class MockitoExampleUnitTests {
     void mock_returnsDefaultValuesWhenNothingIsStubbed() {
         List<String> mockedList = Mockito.mock(List.class);
 
-        assertThat(mockedList.size()).isZero();
-        assertThat(mockedList.isEmpty()).isFalse();
-        assertThat(mockedList.get(0)).isNull();
-        assertThat(mockedList.subList(0, 3)).isEmpty();
+        Assertions.assertThat(mockedList.size()).isZero();
+        Assertions.assertThat(mockedList.isEmpty()).isFalse();
+        Assertions.assertThat(mockedList.get(0)).isNull();
+        Assertions.assertThat(mockedList.subList(0, 3)).isEmpty();
     }
 
     @Test
@@ -42,12 +41,12 @@ public class MockitoExampleUnitTests {
         List<String> realList = new ArrayList<>();
         realList.add("foo");
         realList.add("bar");
-        assertThat(realList.size()).isEqualTo(2);
+        Assertions.assertThat(realList.size()).isEqualTo(2);
 
         List<String> mockedList = Mockito.mock(List.class);
         mockedList.add("foo");
         mockedList.add("bar");
-        assertThat(mockedList.size()).isZero();
+        Assertions.assertThat(mockedList.size()).isZero();
     }
 
     /**
@@ -59,11 +58,11 @@ public class MockitoExampleUnitTests {
         List<String> list = Mockito.mock(List.class);
         Mockito.when(list.get(0)).thenReturn("first");
 
-        assertThat(list.get(0)).isEqualTo("first");
-        assertThat(list.get(1)).isNull(); // not stubbed for argument 1
+        Assertions.assertThat(list.get(0)).isEqualTo("first");
+        Assertions.assertThat(list.get(1)).isNull(); // not stubbed for argument 1
 
         Mockito.when(list.get(1)).thenReturn("second");
-        assertThat(list.get(1)).isEqualTo("second");
+        Assertions.assertThat(list.get(1)).isEqualTo("second");
 
         Mockito.verify(list, Mockito.times(3)).get(Mockito.anyInt());
         Mockito.verify(list, Mockito.times(1)).get(0);
@@ -79,12 +78,12 @@ public class MockitoExampleUnitTests {
         Mockito.when(iterator.hasNext()).thenReturn(true, true, false);
         Mockito.when(iterator.next()).thenReturn("a").thenReturn("b").thenThrow(new NoSuchElementException());
 
-        assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo("a");
-        assertThat(iterator.hasNext()).isTrue();
-        assertThat(iterator.next()).isEqualTo("b");
-        assertThat(iterator.hasNext()).isFalse();
-        assertThatThrownBy(iterator::next).isInstanceOf(NoSuchElementException.class);
+        Assertions.assertThat(iterator.hasNext()).isTrue();
+        Assertions.assertThat(iterator.next()).isEqualTo("a");
+        Assertions.assertThat(iterator.hasNext()).isTrue();
+        Assertions.assertThat(iterator.next()).isEqualTo("b");
+        Assertions.assertThat(iterator.hasNext()).isFalse();
+        Assertions.assertThatThrownBy(iterator::next).isInstanceOf(NoSuchElementException.class);
     }
 
     /**
@@ -95,7 +94,7 @@ public class MockitoExampleUnitTests {
         List<String> list = Mockito.mock(List.class);
         Mockito.when(list.get(5)).thenThrow(new IndexOutOfBoundsException("no such element"));
 
-        assertThatThrownBy(() -> list.get(5))
+        Assertions.assertThatThrownBy(() -> list.get(5))
                 .isInstanceOf(IndexOutOfBoundsException.class)
                 .hasMessage("no such element");
     }
@@ -108,7 +107,7 @@ public class MockitoExampleUnitTests {
         List<String> list = Mockito.mock(List.class);
         Mockito.doThrow(new UnsupportedOperationException("read only")).when(list).clear();
 
-        assertThatThrownBy(list::clear).isInstanceOf(UnsupportedOperationException.class);
+        Assertions.assertThatThrownBy(list::clear).isInstanceOf(UnsupportedOperationException.class);
     }
 
     /**
@@ -119,8 +118,8 @@ public class MockitoExampleUnitTests {
         List<String> list = Mockito.mock(List.class);
         Mockito.when(list.get(Mockito.anyInt())).thenAnswer(invocation -> "item-" + invocation.getArgument(0));
 
-        assertThat(list.get(3)).isEqualTo("item-3");
-        assertThat(list.get(7)).isEqualTo("item-7");
+        Assertions.assertThat(list.get(3)).isEqualTo("item-3");
+        Assertions.assertThat(list.get(7)).isEqualTo("item-7");
     }
 
     // ---------------------------------------------------------------- argument matchers
@@ -133,8 +132,8 @@ public class MockitoExampleUnitTests {
         Map<String, Integer> map = Mockito.mock(Map.class);
         Mockito.when(map.get(Mockito.anyString())).thenReturn(42);
 
-        assertThat(map.get("x")).isEqualTo(42);
-        assertThat(map.get("anything else")).isEqualTo(42);
+        Assertions.assertThat(map.get("x")).isEqualTo(42);
+        Assertions.assertThat(map.get("anything else")).isEqualTo(42);
     }
 
     /**
@@ -145,8 +144,8 @@ public class MockitoExampleUnitTests {
         Map<String, Integer> map = Mockito.mock(Map.class);
         Mockito.when(map.getOrDefault(Mockito.eq("key"), Mockito.anyInt())).thenReturn(1);
 
-        assertThat(map.getOrDefault("key", 0)).isEqualTo(1);
-        assertThat(map.getOrDefault("other", 0)).isNull(); // "other" does not match eq("key")
+        Assertions.assertThat(map.getOrDefault("key", 0)).isEqualTo(1);
+        Assertions.assertThat(map.getOrDefault("other", 0)).isNull(); // "other" does not match eq("key")
     }
 
     // ---------------------------------------------------------------- verifying
@@ -199,7 +198,7 @@ public class MockitoExampleUnitTests {
         list.add("two");
 
         Mockito.verify(list, Mockito.times(2)).add(captor.capture());
-        assertThat(captor.getAllValues()).containsExactly("one", "two");
+        Assertions.assertThat(captor.getAllValues()).containsExactly("one", "two");
     }
 
     // ---------------------------------------------------------------- spies
@@ -215,8 +214,8 @@ public class MockitoExampleUnitTests {
         spy.add("one");
         spy.add("two");
 
-        assertThat(spy).containsExactly("one", "two"); // real behaviour
-        assertThat(spy.size()).isEqualTo(2);
+        Assertions.assertThat(spy).containsExactly("one", "two"); // real behaviour
+        Assertions.assertThat(spy.size()).isEqualTo(2);
         Mockito.verify(spy).add("one");
     }
 
@@ -231,8 +230,8 @@ public class MockitoExampleUnitTests {
 
         Mockito.doReturn(100).when(spy).size();
 
-        assertThat(spy.size()).isEqualTo(100); // stubbed
-        assertThat(spy.get(0)).isEqualTo("one"); // still real
+        Assertions.assertThat(spy.size()).isEqualTo(100); // stubbed
+        Assertions.assertThat(spy.get(0)).isEqualTo("one"); // still real
     }
 
     /**
@@ -246,9 +245,9 @@ public class MockitoExampleUnitTests {
         mock.add("one");
         spy.add("one");
 
-        assertThat(mock.size()).isZero(); // the add() call did nothing
-        assertThat(spy.size()).isEqualTo(1); // the add() call really added the element
-        assertThat(Mockito.mockingDetails(mock).isSpy()).isFalse();
-        assertThat(Mockito.mockingDetails(spy).isSpy()).isTrue();
+        Assertions.assertThat(mock.size()).isZero(); // the add() call did nothing
+        Assertions.assertThat(spy.size()).isEqualTo(1); // the add() call really added the element
+        Assertions.assertThat(Mockito.mockingDetails(mock).isSpy()).isFalse();
+        Assertions.assertThat(Mockito.mockingDetails(spy).isSpy()).isTrue();
     }
 }
