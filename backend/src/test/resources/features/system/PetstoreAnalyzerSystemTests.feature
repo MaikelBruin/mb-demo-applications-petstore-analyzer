@@ -52,14 +52,24 @@ Feature: Petstore analyzer system tests
 
     ############## new application requirements ###########################
 
-  Scenario: 1. Consumer should be notified for each analysis done
+  Scenario: 1. Availability ratio - Division by zero should result not result in exception
+    Given I configured the petstore find pets by status "sold" response to return an empty array
+    When I get the ratio of available pets vs sold pets
+    Then the availability ratio response should not be null
+    And the availability ratio should be equal to 0
+
+  Scenario: 2. Consumer should be notified for each analysis done
     When I get if there are any rats available
     And I get the ratio of available pets vs sold pets
     And I get the total number of available pets
     And I get the total number of pets with tag "rat"
     Then the consumer should be notified 4 times
+    And the consumer should have received an event of type "has-available"
+    And the consumer should have received an event of type "availability-ratio"
+    And the consumer should have received an event of type "total-available"
+    And the consumer should have received an event of type "total-pets"
 
-  Scenario: 2. Petstore 503 should result in SupplierDownException
+  Scenario: 3. Petstore 503 should result in SupplierDownException
     Given I configured the petstore to respond with a service unavailable exception
     When I get the total number of dogs and capture the HTTP status
     Then the analyzer should have responded with HTTP status 503
@@ -67,14 +77,15 @@ Feature: Petstore analyzer system tests
     And the error message of the response should be "Petstore supplier is down"
     And the consumer should not have received any event
 
-  Scenario: 3. Consumer 503 should result in ConsumerDownException
+  Scenario: 4. Consumer 503 should result in ConsumerDownException
     Given I configured the consumer to respond with a service unavailable exception
     When I get the total number of dogs and capture the HTTP status
     Then the analyzer should have responded with HTTP status 503
     And the analyzer should have thrown a ConsumerDownException
     And the error message of the response should be "Petstore analyzer consumer is down"
+    And the consumer should have received an event of type "total-dogs"
 
-  Scenario: 4. Consumer 418 should be ignored
+  Scenario: 5. Consumer 418 should be ignored
     Given I configured the consumer to respond with a teapot exception
     When I get the total number of dogs
     Then the total number of dogs response should not be null

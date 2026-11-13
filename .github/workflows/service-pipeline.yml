@@ -21,9 +21,11 @@ jobs:
           server-username: MB_GITHUB_USERNAME
           server-password: MB_GITHUB_PASS
           cache: maven
-      - name: Build and test service
+      - name: Build and test service in isolation
+        # skips the system integration tests: they need the real petstore and a running consumer.
+        # -Dit.test replaces the failsafe includes from backend/pom.xml, so they are repeated here.
         run: |
-          mvn clean install
+          mvn clean install "-Dit.test=System*TestRunner,*IntegrationTests,!SystemIntegrationTestRunner"
         env:
           MB_GITHUB_USERNAME: ${{ github.actor }}
           MB_GITHUB_PASS: ${{ secrets.MB_PAT }}
