@@ -2,6 +2,7 @@
 
 ## TODO
 - use newer version of extra mocks and show mock util classes
+  - also generate config class that replaces the bean just to showcase how far you can go
 
 ## DONE
 - debug 500 response from petstore api
