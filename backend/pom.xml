@@ -190,12 +190,12 @@
         <dependency>
             <groupId>mb.demos.openapi.generated.api.client</groupId>
             <artifactId>petstore</artifactId>
-            <version>1.0.27-extra-mocks-121b7b6d358316480c380c23a6abfb1ff0a1a95f</version>
+            <version>1.0.27-extra-mocks-39dc4324e747f520abbfb1c817a314d17d56da13</version>
         </dependency>
         <dependency>
             <groupId>mb.demos.openapi.generated.api.client</groupId>
             <artifactId>petstore-analyzer-consumer</artifactId>
-            <version>1.1.1-extra-mocks-121b7b6d358316480c380c23a6abfb1ff0a1a95f</version>
+            <version>1.1.1-extra-mocks-39dc4324e747f520abbfb1c817a314d17d56da13</version>
         </dependency>
         <!-- END GENERATED CLIENT -->
     </dependencies>

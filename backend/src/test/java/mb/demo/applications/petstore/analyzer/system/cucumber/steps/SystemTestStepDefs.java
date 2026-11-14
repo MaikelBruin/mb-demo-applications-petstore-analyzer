@@ -12,13 +12,13 @@ import mb.demo.applications.petstore.analyzer.base.cucumber.steps.BaseCucumberSt
 import mb.demo.applications.petstore.analyzer.exceptions.ConsumerDownException;
 import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
 import mb.demo.applications.petstore.analyzer.exceptions.RestExceptionHandler;
-import mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
+import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApiMockUtil;
 import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventRequestBody;
 import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
+import mb.demos.openapi.generated.api.client.petstore.api.PetApiMockUtil;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
 import mb.demos.openapi.generated.api.client.petstore.client.ApiResponse;
-import mb.demos.openapi.generated.api.client.petstore.model.ModelApiResponse;
 import mb.demos.openapi.generated.api.client.petstore.model.Pet;
 import mb.demos.openapi.generated.api.client.petstore.model.Tag;
 import org.apache.camel.CamelContext;
@@ -30,8 +30,6 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +42,8 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     private final RestExceptionHandler restExceptionHandler;
     private Integer lastHttpStatus;
     private String lastHttpBody;
+    private PetApiMockUtil petApiMockUtil;
+    private EventsApiMockUtil eventsApiMockUtil;
 
     public SystemTestStepDefs(CamelContext camelContext,
                               ProducerTemplate producerTemplate,
@@ -57,6 +57,9 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
         this.petApi = petApi;
         this.eventsApi = eventsApi;
         this.restExceptionHandler = restExceptionHandler;
+        this.petApiMockUtil = new PetApiMockUtil(petApi);
+        this.eventsApiMockUtil = new EventsApiMockUtil(eventsApi);
+
     }
 
     @Given("I have access to the mocked petstore")
@@ -75,30 +78,33 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
         Assertions.assertThat(isMock).isTrue();
     }
 
+    @And("I configure default responses for the petstore")
+    public void iConfigureDefaultResponsesForThePetstore() {
+        petApiMockUtil.resetToDefaults();
+    }
+
     @And("I configure default responses for the consumer")
     public void iConfigureDefaultResponsesForTheConsumer() {
-        Mockito.reset(eventsApi);
+        eventsApiMockUtil.resetToDefaults();
         Mockito.reset(restExceptionHandler);
     }
 
     @SneakyThrows
     @Given("I configured the consumer to respond with a teapot exception")
     public void iConfiguredTheConsumerToRespondWithATeapotException() {
-        Mockito.when(eventsApi.processEvent(Mockito.any(EventRequestBody.class)))
-                .thenThrow(new mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException(418, "I'm a teapot"));
+        eventsApiMockUtil.stubProcessEventThrows(418, "I'm a teapot");
     }
 
     @SneakyThrows
     @Given("I configured the consumer to respond with a service unavailable exception")
     public void iConfiguredTheConsumerToRespondWithAServiceUnavailableException() {
-        Mockito.when(eventsApi.processEvent(Mockito.any(EventRequestBody.class)))
-                .thenThrow(new mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException(503, "Service Unavailable"));
+        eventsApiMockUtil.stubProcessEventThrows(503, "Service Unavailable");
     }
 
     @SneakyThrows
     @Given("I configured the petstore to respond with a service unavailable exception")
     public void iConfiguredThePetstoreToRespondWithAServiceUnavailableException() {
-        Mockito.doThrow(new ApiException(503, "Service Unavailable")).when(petApi).findPetsByTags(Mockito.nullable(List.class));
+        petApiMockUtil.stubFindPetsByTagsThrows(503, "Service Unavailable");
     }
 
     /**
@@ -172,64 +178,21 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
         Mockito.when(petApi.findPetsByStatus(inputStatus)).thenReturn(Collections.emptyList());
     }
 
-    @SneakyThrows
     @Given("I configured the petstore find pets by tags {string} response to return an empty array")
     public void iConfiguredThePetstoreFindPetsByTagsResponseToReturnAnEmptyArray(String tags) {
-        List<String> tagList = Arrays.stream(tags.split(",")).toList();
-        Mockito.when(petApi.findPetsByTagsWithHttpInfo(tagList)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.emptyList()));
-        Mockito.when(petApi.findPetsByTags(tagList)).thenReturn(Collections.emptyList());
+        // the mock util stubs findPetsByTags for any tags, not only for the given ones
+        petApiMockUtil.stubFindPetsByTags(Collections.emptyList());
     }
 
-    @SneakyThrows
     @Given("I configured the petstore find pets by tags {string} response to return a non-empty array")
     public void iConfiguredThePetstoreFindPetsByTagsResponseToReturnANonEmptyArray(String tags) {
-        List<String> tagList = Arrays.stream(tags.split(",")).toList();
         Pet rat = new Pet()
                 .tags(Collections.singletonList(new Tag().id(1L).name("rat")))
                 .name("scruffy")
                 .id(947L)
                 .status(Pet.StatusEnum.AVAILABLE);
-        Mockito.when(petApi.findPetsByTagsWithHttpInfo(tagList)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.singletonList(rat)));
-        Mockito.when(petApi.findPetsByTags(tagList)).thenReturn(Collections.singletonList(rat));
-    }
-
-
-    @And("I configure default responses for the petstore")
-    public void iConfigureDefaultResponsesForThePetstore() throws ApiException {
-        HashMap<String, List<String>> defaultHeaders = SystemTestMockData.DEFAULT_HEADERS;
-        Mockito.reset(petApi);
-        ApiResponse<Pet> addPetApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.addPetResponseExample);
-        Mockito.doReturn(addPetApiResponse).when(petApi).addPetWithHttpInfo(Mockito.nullable(Pet.class));
-        Mockito.doReturn(SystemTestMockData.addPetResponseExample).when(petApi).addPet(Mockito.nullable(Pet.class));
-
-        ApiResponse<Void> deletePetApiResponse = new ApiResponse(200, defaultHeaders);
-        Mockito.doReturn(deletePetApiResponse).when(petApi).deletePetWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class));
-        Mockito.doNothing().when(petApi).deletePet(Mockito.nullable(Long.class), Mockito.nullable(String.class));
-
-        ApiResponse<List<Pet>> findPetsByStatusApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.findPetsByStatusResponseExample);
-        Mockito.doReturn(findPetsByStatusApiResponse).when(petApi).findPetsByStatusWithHttpInfo(Mockito.nullable(String.class));
-        Mockito.doReturn(SystemTestMockData.findPetsByStatusResponseExample).when(petApi).findPetsByStatus(Mockito.nullable(String.class));
-
-        ApiResponse<List<Pet>> findPetsByTagsApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.findPetsByTagsResponseExample);
-        Mockito.doReturn(findPetsByTagsApiResponse).when(petApi).findPetsByTagsWithHttpInfo(Mockito.nullable(List.class));
-        Mockito.doReturn(SystemTestMockData.findPetsByTagsResponseExample).when(petApi).findPetsByTags(Mockito.nullable(List.class));
-
-        ApiResponse<Pet> getPetByIdApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.getPetByIdResponseExample);
-        Mockito.doReturn(getPetByIdApiResponse).when(petApi).getPetByIdWithHttpInfo(Mockito.nullable(Long.class));
-        Mockito.doReturn(SystemTestMockData.getPetByIdResponseExample).when(petApi).getPetById(Mockito.nullable(Long.class));
-
-        ApiResponse<Pet> updatePetApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.updatePetResponseExample);
-        Mockito.doReturn(updatePetApiResponse).when(petApi).updatePetWithHttpInfo(Mockito.nullable(Pet.class));
-        Mockito.doReturn(SystemTestMockData.updatePetResponseExample).when(petApi).updatePet(Mockito.nullable(Pet.class));
-
-        ApiResponse<Pet> updatePetWithFormApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.updatePetWithFormResponseExample);
-        Mockito.doReturn(updatePetWithFormApiResponse).when(petApi).updatePetWithFormWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(String.class));
-        Mockito.doReturn(SystemTestMockData.updatePetWithFormResponseExample).when(petApi).updatePetWithForm(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(String.class));
-
-        ApiResponse<ModelApiResponse> uploadFileApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.uploadFileResponseExample);
-        Mockito.doReturn(uploadFileApiResponse).when(petApi).uploadFileWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(File.class));
-        Mockito.doReturn(SystemTestMockData.uploadFileResponseExample).when(petApi).uploadFile(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(File.class));
-
+        // the mock util stubs findPetsByTags for any tags, not only for the given ones
+        petApiMockUtil.stubFindPetsByTags(Collections.singletonList(rat));
     }
 
     @SneakyThrows
