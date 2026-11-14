@@ -70,6 +70,25 @@ public class MockitoExampleUnitTests {
     }
 
     /**
+     * A spy object is an actual object on which mockito is spying. The spied object executes the actual methods when invoked.
+     * This means that we are able to check the invocations of the object using Mockito.verify()
+     */
+    @Test
+    void spy_doesExecuteActualMethods() {
+        List<String> realList = new ArrayList<>();
+        realList.add("foo");
+        realList.add("bar");
+        Assertions.assertThat(realList.size()).isEqualTo(2);
+
+        List<String> spiedListObject = Mockito.spy(new ArrayList<>());
+        spiedListObject.add("foo");
+        spiedListObject.add("bar");
+        Assertions.assertThat(spiedListObject.size()).isEqualTo(2);
+
+        Mockito.verify(spiedListObject, Mockito.times(2)).add(Mockito.anyString());
+    }
+
+    /**
      * A method can return a different value on every call. The last value is repeated from then on.
      */
     @Test
