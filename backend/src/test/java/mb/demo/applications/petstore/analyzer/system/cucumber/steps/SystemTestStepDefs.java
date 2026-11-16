@@ -1,6 +1,7 @@
 package mb.demo.applications.petstore.analyzer.system.cucumber.steps;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -10,37 +11,54 @@ import lombok.extern.slf4j.Slf4j;
 import mb.demo.applications.petstore.analyzer.base.cucumber.TestDataHolder;
 import mb.demo.applications.petstore.analyzer.base.cucumber.steps.BaseCucumberStepDefs;
 import mb.demo.applications.petstore.analyzer.exceptions.ConsumerDownException;
-import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
 import mb.demo.applications.petstore.analyzer.exceptions.RestExceptionHandler;
-import mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData;
-import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
-import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.model.EventRequestBody;
-import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
-import mb.demos.openapi.generated.api.client.petstore.client.ApiException;
-import mb.demos.openapi.generated.api.client.petstore.client.ApiResponse;
-import mb.demos.openapi.generated.api.client.petstore.model.ModelApiResponse;
-import mb.demos.openapi.generated.api.client.petstore.model.Pet;
-import mb.demos.openapi.generated.api.client.petstore.model.Tag;
+import mb.demo.applications.petstore.analyzer.exceptions.SupplierDownException;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.assertj.core.api.Assertions;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientResponseException;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.any;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.havingExactly;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.serviceUnavailable;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData.ANY_PET_PATH_REGEX;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData.AVAILABLE_RAT_LIST_JSON;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData.EMPTY_LIST_JSON;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData.EVENT_ACCEPTED_JSON;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData.FIND_PETS_BY_STATUS_PATH;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData.FIND_PETS_BY_TAGS_PATH;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData.PET_LIST_JSON;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestMockData.PROCESS_EVENT_PATH;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestWireMockConfiguration.CONSUMER_WIREMOCK;
+import static mb.demo.applications.petstore.analyzer.system.cucumber.config.SystemTestWireMockConfiguration.PETSTORE_WIREMOCK;
 
 
+/**
+ * The petstore and the consumer are WireMock servers: stubs describe HTTP requests and responses, not Java method
+ * calls. That is why a single stub per endpoint is enough (no separate stubs for e.g. findPetsByTags and
+ * findPetsByTagsWithHttpInfo), and why error scenarios return an HTTP status instead of throwing an ApiException: the
+ * generated client turns it into the exception, exactly like in production.
+ */
 @Slf4j
 public class SystemTestStepDefs extends BaseCucumberStepDefs {
-    private final PetApi petApi;
-    private final EventsApi eventsApi;
+    private final WireMockServer petstoreWireMock;
+    private final WireMockServer consumerWireMock;
     private final RestExceptionHandler restExceptionHandler;
     private Integer lastHttpStatus;
     private String lastHttpBody;
@@ -50,57 +68,88 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
                               TestDataHolder testDataHolder,
                               ObjectMapper objectMapper,
                               TestRestTemplate testRestTemplate,
-                              final PetApi petApi,
-                              final EventsApi eventsApi,
+                              @Qualifier(PETSTORE_WIREMOCK) final WireMockServer petstoreWireMock,
+                              @Qualifier(CONSUMER_WIREMOCK) final WireMockServer consumerWireMock,
                               final RestExceptionHandler restExceptionHandler) {
         super(camelContext, producerTemplate, testDataHolder, objectMapper, testRestTemplate);
-        this.petApi = petApi;
-        this.eventsApi = eventsApi;
+        this.petstoreWireMock = petstoreWireMock;
+        this.consumerWireMock = consumerWireMock;
         this.restExceptionHandler = restExceptionHandler;
     }
 
     @Given("I have access to the mocked petstore")
     public void iHaveAccessToTheMockedPetstore() {
-        log.info("I have access to the mocked petstore");
-        Assertions.assertThat(petApi).isNotNull();
-        boolean isMock = Mockito.mockingDetails(petApi).isMock();
-        Assertions.assertThat(isMock).isTrue();
+        log.info("I have access to the mocked petstore at '{}'", petstoreWireMock.baseUrl());
+        Assertions.assertThat(petstoreWireMock.isRunning()).isTrue();
     }
 
     @And("I have access to the mocked consumer")
     public void iHaveAccessToTheMockedConsumer() {
-        log.info("I have access to the mocked consumer");
-        Assertions.assertThat(eventsApi).isNotNull();
-        boolean isMock = Mockito.mockingDetails(eventsApi).isMock();
-        Assertions.assertThat(isMock).isTrue();
+        log.info("I have access to the mocked consumer at '{}'", consumerWireMock.baseUrl());
+        Assertions.assertThat(consumerWireMock.isRunning()).isTrue();
+    }
+
+    /**
+     * resetAll() removes the stubs and the recorded requests of the previous scenario: the servers live as long as
+     * the spring context, which is shared by all scenarios.
+     */
+    @And("I configure default responses for the petstore")
+    public void iConfigureDefaultResponsesForThePetstore() {
+        petstoreWireMock.resetAll();
+        petstoreWireMock.stubFor(get(urlPathEqualTo(FIND_PETS_BY_TAGS_PATH)).willReturn(okJson(PET_LIST_JSON)));
+        petstoreWireMock.stubFor(get(urlPathEqualTo(FIND_PETS_BY_STATUS_PATH)).willReturn(okJson(PET_LIST_JSON)));
     }
 
     @And("I configure default responses for the consumer")
     public void iConfigureDefaultResponsesForTheConsumer() {
-        Mockito.reset(eventsApi);
+        consumerWireMock.resetAll();
+        consumerWireMock.stubFor(post(urlPathEqualTo(PROCESS_EVENT_PATH)).willReturn(aResponse()
+                .withStatus(202)
+                .withHeader("Content-Type", "application/json")
+                .withBody(EVENT_ACCEPTED_JSON)));
         Mockito.reset(restExceptionHandler);
     }
 
-    @SneakyThrows
+    /**
+     * When several stubs match a request, WireMock uses the one added last: so this overrides the default response.
+     */
     @Given("I configured the consumer to respond with a teapot exception")
     public void iConfiguredTheConsumerToRespondWithATeapotException() {
-        Mockito.when(eventsApi.processEvent(Mockito.any(EventRequestBody.class)))
-                .thenThrow(new mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException(418, "I'm a teapot"));
+        consumerWireMock.stubFor(post(urlPathEqualTo(PROCESS_EVENT_PATH)).willReturn(aResponse().withStatus(418)));
     }
 
-    @SneakyThrows
     @Given("I configured the consumer to respond with a service unavailable exception")
     public void iConfiguredTheConsumerToRespondWithAServiceUnavailableException() {
-        Mockito.when(eventsApi.processEvent(Mockito.any(EventRequestBody.class)))
-                .thenThrow(new mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.client.ApiException(503, "Service Unavailable"));
+        consumerWireMock.stubFor(post(urlPathEqualTo(PROCESS_EVENT_PATH)).willReturn(serviceUnavailable()));
     }
 
-    @SneakyThrows
     @Given("I configured the petstore to respond with a service unavailable exception")
     public void iConfiguredThePetstoreToRespondWithAServiceUnavailableException() {
-        Mockito.doThrow(new ApiException(503, "Service Unavailable")).when(petApi).findPetsByTags(Mockito.nullable(List.class));
-        Mockito.doThrow(new ApiException(503, "Service Unavailable")).when(petApi).findPetsByStatus(Mockito.nullable(String.class));
-        Mockito.doThrow(new ApiException(503, "Service Unavailable")).when(petApi).getPetById(Mockito.nullable(Long.class));
+        petstoreWireMock.stubFor(any(urlPathMatching(ANY_PET_PATH_REGEX)).willReturn(serviceUnavailable()));
+    }
+
+    @Given("I configured the petstore find pets by status {string} response to return an empty array")
+    public void iConfiguredThePetstoreFindPetsByStatusResponseToReturnAnEmptyArray(String inputStatus) {
+        petstoreWireMock.stubFor(get(urlPathEqualTo(FIND_PETS_BY_STATUS_PATH))
+                .withQueryParam("status", equalTo(inputStatus))
+                .willReturn(okJson(EMPTY_LIST_JSON)));
+    }
+
+    /**
+     * The generated client sends a list as a repeated query parameter: ?tags=rat&tags=rats.
+     */
+    @Given("I configured the petstore find pets by tags {string} response to return an empty array")
+    public void iConfiguredThePetstoreFindPetsByTagsResponseToReturnAnEmptyArray(String tags) {
+        petstoreWireMock.stubFor(get(urlPathEqualTo(FIND_PETS_BY_TAGS_PATH))
+                .withQueryParam("tags", havingExactly(tags.split(",")))
+                .willReturn(okJson(EMPTY_LIST_JSON)));
+    }
+
+    @Given("I configured the petstore find pets by tags {string} response to return a non-empty array")
+    public void iConfiguredThePetstoreFindPetsByTagsResponseToReturnANonEmptyArray(String tags) {
+        petstoreWireMock.stubFor(get(urlPathEqualTo(FIND_PETS_BY_TAGS_PATH))
+                .withQueryParam("tags", havingExactly(tags.split(",")))
+                .willReturn(okJson(AVAILABLE_RAT_LIST_JSON)));
     }
 
     /**
@@ -156,87 +205,22 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
         Assertions.assertThat(captor.getValue().getCode()).isEqualTo(503);
     }
 
+    /**
+     * WireMock records every request it receives, so it can be verified just like the calls on a Mockito mock.
+     */
     @Then("the consumer should not have received any event")
     public void theConsumerShouldNotHaveReceivedAnyEvent() {
-        Mockito.verifyNoInteractions(eventsApi);
+        consumerWireMock.verify(0, anyRequestedFor(anyUrl()));
     }
 
-    @SneakyThrows
     @Then("the consumer should have received an event of type {string}")
     public void theConsumerShouldHaveReceivedAnEventOfType(String expectedEventType) {
-        Mockito.verify(eventsApi).processEvent(Mockito.argThat(body -> expectedEventType.equals(body.getEventType())));
+        consumerWireMock.verify(1, postRequestedFor(urlPathEqualTo(PROCESS_EVENT_PATH))
+                .withRequestBody(matchingJsonPath("$.eventType", equalTo(expectedEventType))));
     }
 
-    @SneakyThrows
-    @Given("I configured the petstore find pets by status {string} response to return an empty array")
-    public void iConfiguredThePetstoreFindPetsByStatusResponseToReturnAnEmptyArray(String inputStatus) {
-        Mockito.when(petApi.findPetsByStatusWithHttpInfo(inputStatus)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.emptyList()));
-        Mockito.when(petApi.findPetsByStatus(inputStatus)).thenReturn(Collections.emptyList());
-    }
-
-    @SneakyThrows
-    @Given("I configured the petstore find pets by tags {string} response to return an empty array")
-    public void iConfiguredThePetstoreFindPetsByTagsResponseToReturnAnEmptyArray(String tags) {
-        List<String> tagList = Arrays.stream(tags.split(",")).toList();
-        Mockito.when(petApi.findPetsByTagsWithHttpInfo(tagList)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.emptyList()));
-        Mockito.when(petApi.findPetsByTags(tagList)).thenReturn(Collections.emptyList());
-    }
-
-    @SneakyThrows
-    @Given("I configured the petstore find pets by tags {string} response to return a non-empty array")
-    public void iConfiguredThePetstoreFindPetsByTagsResponseToReturnANonEmptyArray(String tags) {
-        List<String> tagList = Arrays.stream(tags.split(",")).toList();
-        Pet rat = new Pet()
-                .tags(Collections.singletonList(new Tag().id(1L).name("rat")))
-                .name("scruffy")
-                .id(947L)
-                .status(Pet.StatusEnum.AVAILABLE);
-        Mockito.when(petApi.findPetsByTagsWithHttpInfo(tagList)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.singletonList(rat)));
-        Mockito.when(petApi.findPetsByTags(tagList)).thenReturn(Collections.singletonList(rat));
-    }
-
-
-    @And("I configure default responses for the petstore")
-    public void iConfigureDefaultResponsesForThePetstore() throws ApiException {
-        HashMap<String, List<String>> defaultHeaders = SystemTestMockData.DEFAULT_HEADERS;
-        Mockito.reset(petApi);
-        ApiResponse<Pet> addPetApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.addPetResponseExample);
-        Mockito.doReturn(addPetApiResponse).when(petApi).addPetWithHttpInfo(Mockito.nullable(Pet.class));
-        Mockito.doReturn(SystemTestMockData.addPetResponseExample).when(petApi).addPet(Mockito.nullable(Pet.class));
-
-        ApiResponse<Void> deletePetApiResponse = new ApiResponse(200, defaultHeaders);
-        Mockito.doReturn(deletePetApiResponse).when(petApi).deletePetWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class));
-        Mockito.doNothing().when(petApi).deletePet(Mockito.nullable(Long.class), Mockito.nullable(String.class));
-
-        ApiResponse<List<Pet>> findPetsByStatusApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.findPetsByStatusResponseExample);
-        Mockito.doReturn(findPetsByStatusApiResponse).when(petApi).findPetsByStatusWithHttpInfo(Mockito.nullable(String.class));
-        Mockito.doReturn(SystemTestMockData.findPetsByStatusResponseExample).when(petApi).findPetsByStatus(Mockito.nullable(String.class));
-
-        ApiResponse<List<Pet>> findPetsByTagsApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.findPetsByTagsResponseExample);
-        Mockito.doReturn(findPetsByTagsApiResponse).when(petApi).findPetsByTagsWithHttpInfo(Mockito.nullable(List.class));
-        Mockito.doReturn(SystemTestMockData.findPetsByTagsResponseExample).when(petApi).findPetsByTags(Mockito.nullable(List.class));
-
-        ApiResponse<Pet> getPetByIdApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.getPetByIdResponseExample);
-        Mockito.doReturn(getPetByIdApiResponse).when(petApi).getPetByIdWithHttpInfo(Mockito.nullable(Long.class));
-        Mockito.doReturn(SystemTestMockData.getPetByIdResponseExample).when(petApi).getPetById(Mockito.nullable(Long.class));
-
-        ApiResponse<Pet> updatePetApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.updatePetResponseExample);
-        Mockito.doReturn(updatePetApiResponse).when(petApi).updatePetWithHttpInfo(Mockito.nullable(Pet.class));
-        Mockito.doReturn(SystemTestMockData.updatePetResponseExample).when(petApi).updatePet(Mockito.nullable(Pet.class));
-
-        ApiResponse<Pet> updatePetWithFormApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.updatePetWithFormResponseExample);
-        Mockito.doReturn(updatePetWithFormApiResponse).when(petApi).updatePetWithFormWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(String.class));
-        Mockito.doReturn(SystemTestMockData.updatePetWithFormResponseExample).when(petApi).updatePetWithForm(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(String.class));
-
-        ApiResponse<ModelApiResponse> uploadFileApiResponse = new ApiResponse(200, defaultHeaders, SystemTestMockData.uploadFileResponseExample);
-        Mockito.doReturn(uploadFileApiResponse).when(petApi).uploadFileWithHttpInfo(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(File.class));
-        Mockito.doReturn(SystemTestMockData.uploadFileResponseExample).when(petApi).uploadFile(Mockito.nullable(Long.class), Mockito.nullable(String.class), Mockito.nullable(File.class));
-
-    }
-
-    @SneakyThrows
     @Then("the consumer should be notified {int} times")
     public void theConsumerShouldBeNotifiedTimes(int expectedNumberOfNotifications) {
-        Mockito.verify(eventsApi, Mockito.times(expectedNumberOfNotifications)).processEvent(Mockito.any(EventRequestBody.class));
+        consumerWireMock.verify(expectedNumberOfNotifications, postRequestedFor(urlPathEqualTo(PROCESS_EVENT_PATH)));
     }
 }

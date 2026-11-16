@@ -1,50 +1,59 @@
 package mb.demo.applications.petstore.analyzer.system.cucumber.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import mb.demos.openapi.generated.api.client.petstore.model.ModelApiResponse;
-import mb.demos.openapi.generated.api.client.petstore.model.Pet;
+/**
+ * Paths and JSON response bodies for the WireMock stubs. The paths are relative to the base urls of the services,
+ * exactly as the generated clients append them.
+ */
+public final class SystemTestMockData {
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+    // ---------------------------------------------------------------- petstore
 
-public class SystemTestMockData {
+    public static final String FIND_PETS_BY_TAGS_PATH = "/pet/findByTags";
+    public static final String FIND_PETS_BY_STATUS_PATH = "/pet/findByStatus";
+    /** Matches every endpoint of the petstore PetApi. */
+    public static final String ANY_PET_PATH_REGEX = "/pet.*";
 
-    public static final HashMap<String, List<String>> DEFAULT_HEADERS = new HashMap<String, List<String>>() {
-        {
-            this.put("Content-Type", Collections.singletonList("application/json"));
-            this.put("Accept", Collections.singletonList("application/json"));
-            this.put("X-Source-System", Collections.singletonList("eu-nl-PetApi"));
-            this.put("X-Author-Id", Collections.singletonList("eu-nl-PetApi"));
-            this.put("X-Correlation-Id", Collections.singletonList("PetApi-correlation-id"));
-        }
-    };
+    public static final String PET_LIST_JSON = """
+            [ {
+              "id" : 10,
+              "name" : "doggie",
+              "category" : { "id" : 1, "name" : "Dogs" },
+              "photoUrls" : [ "photoUrls", "photoUrls" ],
+              "tags" : [ { "id" : 0, "name" : "name" }, { "id" : 0, "name" : "name" } ],
+              "status" : "available"
+            }, {
+              "id" : 10,
+              "name" : "doggie",
+              "category" : { "id" : 1, "name" : "Dogs" },
+              "photoUrls" : [ "photoUrls", "photoUrls" ],
+              "tags" : [ { "id" : 0, "name" : "name" }, { "id" : 0, "name" : "name" } ],
+              "status" : "available"
+            } ]
+            """;
 
-    public static Pet addPetResponseExample;
-    public static List<Pet> findPetsByStatusResponseExample;
-    public static List<Pet> findPetsByTagsResponseExample;
-    public static Pet getPetByIdResponseExample;
-    public static Pet updatePetResponseExample;
-    public static Pet updatePetWithFormResponseExample;
-    public static ModelApiResponse uploadFileResponseExample;
+    public static final String AVAILABLE_RAT_LIST_JSON = """
+            [ {
+              "id" : 947,
+              "name" : "scruffy",
+              "photoUrls" : [ ],
+              "tags" : [ { "id" : 1, "name" : "rat" } ],
+              "status" : "available"
+            } ]
+            """;
 
+    public static final String EMPTY_LIST_JSON = "[ ]";
 
-    static {
-        try {
-            addPetResponseExample = new ObjectMapper().readValue("{\n  \"photoUrls\" : [ \"photoUrls\", \"photoUrls\" ],\n  \"name\" : \"doggie\",\n  \"id\" : 10,\n  \"category\" : {\n    \"name\" : \"Dogs\",\n    \"id\" : 1\n  },\n  \"tags\" : [ {\n    \"name\" : \"name\",\n    \"id\" : 0\n  }, {\n    \"name\" : \"name\",\n    \"id\" : 0\n  } ],\n  \"status\" : \"available\"\n}\n", Pet.class);
-            Pet[] findPetsByStatusResponseExampleArray = new ObjectMapper().readValue("                [ {\n  \"photoUrls\" : [ \"photoUrls\", \"photoUrls\" ],\n  \"name\" : \"doggie\",\n  \"id\" : 10,\n  \"category\" : {\n    \"name\" : \"Dogs\",\n    \"id\" : 1\n  },\n  \"tags\" : [ {\n    \"name\" : \"name\",\n    \"id\" : 0\n  }, {\n    \"name\" : \"name\",\n    \"id\" : 0\n  } ],\n  \"status\" : \"available\"\n}, {\n  \"photoUrls\" : [ \"photoUrls\", \"photoUrls\" ],\n  \"name\" : \"doggie\",\n  \"id\" : 10,\n  \"category\" : {\n    \"name\" : \"Dogs\",\n    \"id\" : 1\n  },\n  \"tags\" : [ {\n    \"name\" : \"name\",\n    \"id\" : 0\n  }, {\n    \"name\" : \"name\",\n    \"id\" : 0\n  } ],\n  \"status\" : \"available\"\n} ]\n", Pet[].class);
-            findPetsByStatusResponseExample = Arrays.stream(findPetsByStatusResponseExampleArray).toList();
-            Pet[] findPetsByTagsResponseExampleArray = new ObjectMapper().readValue("                [ {\n  \"photoUrls\" : [ \"photoUrls\", \"photoUrls\" ],\n  \"name\" : \"doggie\",\n  \"id\" : 10,\n  \"category\" : {\n    \"name\" : \"Dogs\",\n    \"id\" : 1\n  },\n  \"tags\" : [ {\n    \"name\" : \"name\",\n    \"id\" : 0\n  }, {\n    \"name\" : \"name\",\n    \"id\" : 0\n  } ],\n  \"status\" : \"available\"\n}, {\n  \"photoUrls\" : [ \"photoUrls\", \"photoUrls\" ],\n  \"name\" : \"doggie\",\n  \"id\" : 10,\n  \"category\" : {\n    \"name\" : \"Dogs\",\n    \"id\" : 1\n  },\n  \"tags\" : [ {\n    \"name\" : \"name\",\n    \"id\" : 0\n  }, {\n    \"name\" : \"name\",\n    \"id\" : 0\n  } ],\n  \"status\" : \"available\"\n} ]\n", Pet[].class);
-            findPetsByTagsResponseExample = Arrays.stream(findPetsByTagsResponseExampleArray).toList();
-            getPetByIdResponseExample = new ObjectMapper().readValue("                                {\n  \"photoUrls\" : [ \"photoUrls\", \"photoUrls\" ],\n  \"name\" : \"doggie\",\n  \"id\" : 10,\n  \"category\" : {\n    \"name\" : \"Dogs\",\n    \"id\" : 1\n  },\n  \"tags\" : [ {\n    \"name\" : \"name\",\n    \"id\" : 0\n  }, {\n    \"name\" : \"name\",\n    \"id\" : 0\n  } ],\n  \"status\" : \"available\"\n}\n", Pet.class);
-            updatePetResponseExample = new ObjectMapper().readValue("                                {\n  \"photoUrls\" : [ \"photoUrls\", \"photoUrls\" ],\n  \"name\" : \"doggie\",\n  \"id\" : 10,\n  \"category\" : {\n    \"name\" : \"Dogs\",\n    \"id\" : 1\n  },\n  \"tags\" : [ {\n    \"name\" : \"name\",\n    \"id\" : 0\n  }, {\n    \"name\" : \"name\",\n    \"id\" : 0\n  } ],\n  \"status\" : \"available\"\n}\n", Pet.class);
-            updatePetWithFormResponseExample = new ObjectMapper().readValue("                                {\n  \"photoUrls\" : [ \"photoUrls\", \"photoUrls\" ],\n  \"name\" : \"doggie\",\n  \"id\" : 10,\n  \"category\" : {\n    \"name\" : \"Dogs\",\n    \"id\" : 1\n  },\n  \"tags\" : [ {\n    \"name\" : \"name\",\n    \"id\" : 0\n  }, {\n    \"name\" : \"name\",\n    \"id\" : 0\n  } ],\n  \"status\" : \"available\"\n}\n", Pet.class);
-            uploadFileResponseExample = new ObjectMapper().readValue("                                {\n  \"code\" : 0,\n  \"type\" : \"type\",\n  \"message\" : \"message\"\n}\n", ModelApiResponse.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    // ---------------------------------------------------------------- consumer
+
+    public static final String PROCESS_EVENT_PATH = "/api/process/event";
+
+    public static final String EVENT_ACCEPTED_JSON = """
+            {
+              "eventId" : "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "receivedAt" : "2026-01-01T12:00:00.000Z"
+            }
+            """;
+
+    private SystemTestMockData() {
     }
-
 }

@@ -3,21 +3,18 @@ package mb.demo.applications.petstore.analyzer.system.cucumber.config;
 import io.cucumber.spring.CucumberContextConfiguration;
 import mb.demo.applications.petstore.analyzer.base.ContainerBootstrapper;
 import mb.demo.applications.petstore.analyzer.exceptions.RestExceptionHandler;
-import mb.demos.openapi.generated.api.client.petstore.analyzer.consumer.api.EventsApi;
-import mb.demos.openapi.generated.api.client.petstore.api.PetApi;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
+/**
+ * The petstore and the consumer are replaced by WireMock servers (see {@link SystemTestWireMockConfiguration}), so
+ * the real PetApi and EventsApi clients are used.
+ */
 @ActiveProfiles({"dev", "system", "test", "cucumber"})
 @CucumberContextConfiguration
+@Import(SystemTestWireMockConfiguration.class)
 public class SystemTestConfiguration extends ContainerBootstrapper {
-
-    @MockitoBean
-    private PetApi petApi;
-
-    @MockitoBean
-    private EventsApi eventsApi;
 
     /**
      * A spy (real behaviour, recorded calls) on the exception handler: lets scenarios verify which exception type the

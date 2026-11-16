@@ -118,7 +118,7 @@ Four layers, all under `backend/src/test/java/…/analyzer/`:
 |---|---|---|---|
 | unit | `unit/` | surefire | n/a |
 | integration | `integration/` (`TotalsEndpointIntegrationTests`) | failsafe, `-Dit.test=TotalsEndpointIntegrationTests` | none reached: `TotalsService` (an application unit, not the generated clients) is a `@MockitoBean`; real controller + camel route + `RestExceptionHandler` via `MockMvc` |
-| system | `system/`, `features/system/` | `SystemTestRunner` | `PetApi` and `EventsApi` are `@MockitoBean`s |
+| system | `system/`, `features/system/` | `SystemTestRunner` | real `PetApi` / `EventsApi` clients, talking HTTP to two WireMock servers that stand in for the petstore and the consumer |
 | system-integration | `systemintegration/`, `features/systemintegration/` | `SystemIntegrationTestRunner` | real public petstore (network, flaky) and the real consumer |
 
 (`TODO.md` / older commits call these "isolated" and "integrated"; the packages, profile and class names
@@ -129,11 +129,15 @@ Both cucumber layers boot the full app with `@SpringBootTest(webEnvironment = RA
 `*ContainerBootstrapper` and exercise it **over HTTP** via `TestRestTemplate` — not by calling
 services directly. The structural differences:
 
-- `SystemTestContainerBootstrapper` activates `dev, system, test, cucumber`. Its
-  `SystemTestConfiguration` (`@CucumberContextConfiguration`) declares `@MockitoBean PetApi` and
-  `@MockitoBean EventsApi`, replacing the real beans. The generated petstore jar's mock support
-  (`PetApiMockConfiguration`, `PetApiMockProvider`, `PetApiResponseExamples`) is no longer component-scanned
-  here; example payloads now live in `SystemTestMockData`.
+- `SystemTestConfiguration` (`@CucumberContextConfiguration`) activates `dev, system, test, cucumber` and
+  imports `SystemTestWireMockConfiguration` (`@Profile("system")`). That config creates two `WireMockServer`
+  beans on dynamic ports, qualified `petstoreWireMock` / `consumerWireMock`, and a `DynamicPropertyRegistrar`
+  that points `services.petstore.base-url` / `services.petstore-analyzer-consumer.base-url` at them. The
+  generated clients are therefore **not** mocked: requests go over real HTTP through Jersey and Jackson. Stub
+  paths and JSON bodies live in `SystemTestMockData`. The only Mockito bean left is a `@MockitoSpyBean
+  RestExceptionHandler`, used to verify which exception type was mapped.
+  WireMock comes from `org.wiremock:wiremock-standalone` (test scope): the standalone jar shades Jetty and
+  Jackson, so it does not conflict with the versions managed by `spring-boot-starter-parent`.
 - `SystemIntegrationTestContainerBootstrapper` activates `dev, test, cucumber` (no `system`), mocks
   nothing, and so keeps both real clients.
 
@@ -150,9 +154,13 @@ There are no `application-<profile>.yaml` files; profiles exist purely for bean/
 - Step-def classes extend `BaseCucumberStepDefs` and receive collaborators through **constructor
   injection** (cucumber-spring), including `TestDataHolder` — a `@ScenarioScope` bean from
   `BaseTestConfiguration` used to carry the response from a `When` step to the `Then` steps.
-- Now that `PetApi` is a plain Mockito mock (not a spy), stubbing the plain method is what the service
-  calls; existing steps stub both the plain and `*WithHttpInfo` variants (e.g.
-  `findPetsByTags` and `findPetsByTagsWithHttpInfo`) — keep doing that, and use `Mockito.nullable(...)`
-  matchers for default stubs.
+- System-layer stubs are WireMock stubs on HTTP endpoints, not on Java methods. Paths are relative to the
+  base url as the generated clients append them: `/pet/findByTags` (list params are sent repeated, so
+  `?tags=rat&tags=rats`; match it with `havingExactly(...)`), `/pet/findByStatus`, and `POST /api/process/event`
+  on the consumer. Error scenarios return an HTTP status (e.g. `serviceUnavailable()`), and the generated client
+  turns it into the `ApiException`. The background steps call `resetAll()` on both servers, because the
+  servers (like the Spring context) are shared across scenarios. Scenario-specific stubs override the defaults
+  because WireMock uses the most recently added matching stub. Verify consumer events with
+  `consumerWireMock.verify(...)`, e.g. `matchingJsonPath("$.eventType", ...)`.
 - The shared scenarios are duplicated verbatim in both feature files (marked with `### same tests as
   … ###` banners); when changing one, change the other.
