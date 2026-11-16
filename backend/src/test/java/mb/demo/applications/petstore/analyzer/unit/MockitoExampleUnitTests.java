@@ -78,11 +78,13 @@ public class MockitoExampleUnitTests {
         List<String> realList = new ArrayList<>();
         realList.add("foo");
         realList.add("bar");
+        Assertions.assertThat(realList.get(0)).isEqualTo("foo");
         Assertions.assertThat(realList.size()).isEqualTo(2);
 
         List<String> spiedListObject = Mockito.spy(new ArrayList<>());
         spiedListObject.add("foo");
         spiedListObject.add("bar");
+        Assertions.assertThat(spiedListObject.get(0)).isEqualTo("foo");
         Assertions.assertThat(spiedListObject.size()).isEqualTo(2);
 
         Mockito.verify(spiedListObject, Mockito.times(2)).add(Mockito.anyString());

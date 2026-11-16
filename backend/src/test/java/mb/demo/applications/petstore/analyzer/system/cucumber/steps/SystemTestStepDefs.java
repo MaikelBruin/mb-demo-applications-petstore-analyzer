@@ -99,6 +99,8 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     @Given("I configured the petstore to respond with a service unavailable exception")
     public void iConfiguredThePetstoreToRespondWithAServiceUnavailableException() {
         Mockito.doThrow(new ApiException(503, "Service Unavailable")).when(petApi).findPetsByTags(Mockito.nullable(List.class));
+        Mockito.doThrow(new ApiException(503, "Service Unavailable")).when(petApi).findPetsByStatus(Mockito.nullable(String.class));
+        Mockito.doThrow(new ApiException(503, "Service Unavailable")).when(petApi).getPetById(Mockito.nullable(Long.class));
     }
 
     /**
@@ -161,8 +163,8 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
 
     @SneakyThrows
     @Then("the consumer should have received an event of type {string}")
-    public void theConsumerShouldHaveReceivedAnEventOfType(String eventType) {
-        Mockito.verify(eventsApi).processEvent(Mockito.argThat(body -> eventType.equals(body.getEventType())));
+    public void theConsumerShouldHaveReceivedAnEventOfType(String expectedEventType) {
+        Mockito.verify(eventsApi).processEvent(Mockito.argThat(body -> expectedEventType.equals(body.getEventType())));
     }
 
     @SneakyThrows
