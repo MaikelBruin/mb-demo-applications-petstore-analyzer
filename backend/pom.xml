@@ -165,6 +165,14 @@
             <version>${cucumber.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- WireMock: stands in for the petstore and the consumer in the system tests. The standalone jar shades its
+             dependencies (Jetty, Jackson), so it does not clash with the versions managed by spring-boot-starter-parent. -->
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>3.13.1</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Junit platform and suite -->
         <dependency>
             <groupId>org.junit.platform</groupId>
