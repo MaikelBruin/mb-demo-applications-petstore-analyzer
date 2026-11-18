@@ -13,15 +13,22 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 @CucumberContextConfiguration
 public class SystemTestConfiguration extends ContainerBootstrapper {
 
+    /**
+     * similar to Mockito.mock(PetApi.class);
+     */
     @MockitoBean
     private PetApi petApi;
 
+    /**
+     * similar to Mockito.mock(EventsApi.class);
+     */
     @MockitoBean
     private EventsApi eventsApi;
 
     /**
      * A spy (real behaviour, recorded calls) on the exception handler: lets scenarios verify which exception type the
      * analyzer threw, which is not visible in the HTTP response.
+     * similar to Mockito.spy(RestExceptionHandler.class);
      */
     @MockitoSpyBean
     private RestExceptionHandler restExceptionHandler;

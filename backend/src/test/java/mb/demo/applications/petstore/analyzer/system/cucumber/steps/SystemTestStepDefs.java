@@ -164,7 +164,7 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     @SneakyThrows
     @Then("the consumer should have received an event of type {string}")
     public void theConsumerShouldHaveReceivedAnEventOfType(String expectedEventType) {
-        Mockito.verify(eventsApi).processEvent(Mockito.argThat(body -> expectedEventType.equals(body.getEventType())));
+        Mockito.verify(eventsApi).processEvent(Mockito.argThat(body -> body.getEventType().equals(expectedEventType)));
     }
 
     @SneakyThrows

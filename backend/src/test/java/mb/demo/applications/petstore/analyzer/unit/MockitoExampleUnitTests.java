@@ -55,23 +55,23 @@ public class MockitoExampleUnitTests {
      */
     @Test
     void stubbing_returnsTheConfiguredValueForTheConfiguredArgument() {
-        List<String> list = Mockito.mock(List.class);
-        Mockito.when(list.get(0)).thenReturn("first");
+        List<String> mockedList = Mockito.mock(List.class);
+        Mockito.when(mockedList.get(0)).thenReturn("first");
 
-        Assertions.assertThat(list.get(0)).isEqualTo("first");
-        Assertions.assertThat(list.get(1)).isNull(); // not stubbed for argument 1
+        Assertions.assertThat(mockedList.get(0)).isEqualTo("first");
+        Assertions.assertThat(mockedList.get(1)).isNull(); // not stubbed for argument 1
 
-        Mockito.when(list.get(1)).thenReturn("second");
-        Assertions.assertThat(list.get(1)).isEqualTo("second");
+        Mockito.when(mockedList.get(1)).thenReturn("second");
+        Assertions.assertThat(mockedList.get(1)).isEqualTo("second");
 
-        Mockito.when(list.get(Mockito.anyInt())).thenReturn("first");
-        Assertions.assertThat(list.get(0)).isEqualTo("first");
-        Assertions.assertThat(list.get(1)).isEqualTo("first");
-        Assertions.assertThat(list.get(2)).isEqualTo("first");
+        Mockito.when(mockedList.get(Mockito.anyInt())).thenReturn("first");
+        Assertions.assertThat(mockedList.get(0)).isEqualTo("first");
+        Assertions.assertThat(mockedList.get(1)).isEqualTo("first");
+        Assertions.assertThat(mockedList.get(2)).isEqualTo("first");
 
-        Mockito.verify(list, Mockito.times(6)).get(Mockito.anyInt());
-        Mockito.verify(list, Mockito.times(2)).get(0);
-        Mockito.verify(list, Mockito.times(3)).get(1);
+        Mockito.verify(mockedList, Mockito.times(6)).get(Mockito.anyInt());
+        Mockito.verify(mockedList, Mockito.times(2)).get(0);
+        Mockito.verify(mockedList, Mockito.times(3)).get(1);
     }
 
     /**
