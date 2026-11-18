@@ -170,7 +170,6 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     @SneakyThrows
     @Given("I configured the petstore find pets by status {string} response to return an empty array")
     public void iConfiguredThePetstoreFindPetsByStatusResponseToReturnAnEmptyArray(String inputStatus) {
-        Mockito.when(petApi.findPetsByStatusWithHttpInfo(inputStatus)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.emptyList()));
         Mockito.when(petApi.findPetsByStatus(inputStatus)).thenReturn(Collections.emptyList());
     }
 
@@ -178,7 +177,6 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
     @Given("I configured the petstore find pets by tags {string} response to return an empty array")
     public void iConfiguredThePetstoreFindPetsByTagsResponseToReturnAnEmptyArray(String tags) {
         List<String> tagList = Arrays.stream(tags.split(",")).toList();
-        Mockito.when(petApi.findPetsByTagsWithHttpInfo(tagList)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.emptyList()));
         Mockito.when(petApi.findPetsByTags(tagList)).thenReturn(Collections.emptyList());
     }
 
@@ -191,7 +189,6 @@ public class SystemTestStepDefs extends BaseCucumberStepDefs {
                 .name("scruffy")
                 .id(947L)
                 .status(Pet.StatusEnum.AVAILABLE);
-        Mockito.when(petApi.findPetsByTagsWithHttpInfo(tagList)).thenReturn(new ApiResponse<>(200, new HashMap<>(), Collections.singletonList(rat)));
         Mockito.when(petApi.findPetsByTags(tagList)).thenReturn(Collections.singletonList(rat));
     }
 

@@ -64,9 +64,14 @@ public class MockitoExampleUnitTests {
         Mockito.when(list.get(1)).thenReturn("second");
         Assertions.assertThat(list.get(1)).isEqualTo("second");
 
-        Mockito.verify(list, Mockito.times(3)).get(Mockito.anyInt());
-        Mockito.verify(list, Mockito.times(1)).get(0);
-        Mockito.verify(list, Mockito.times(2)).get(1);
+        Mockito.when(list.get(Mockito.anyInt())).thenReturn("first");
+        Assertions.assertThat(list.get(0)).isEqualTo("first");
+        Assertions.assertThat(list.get(1)).isEqualTo("first");
+        Assertions.assertThat(list.get(2)).isEqualTo("first");
+
+        Mockito.verify(list, Mockito.times(6)).get(Mockito.anyInt());
+        Mockito.verify(list, Mockito.times(2)).get(0);
+        Mockito.verify(list, Mockito.times(3)).get(1);
     }
 
     /**
